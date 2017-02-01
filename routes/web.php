@@ -11,6 +11,5 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('bet/{twitterId}', 'Bet\BetController@placeBet');
+Route::get('login', 'Bet\LoginController@refreshSessions');

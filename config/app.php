@@ -177,6 +177,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
+        Yangqi\Htmldom\HtmldomServiceProvider::class,
         // Spatie\LaravelTwitterStreamingApi\TwitterStreamingApiServiceProvider::class,
 
     ],
@@ -228,6 +229,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
 
+         'Htmldom' => Yangqi\Htmldom\Htmldom::class,
         // 'TwitterStreamingApi' => Spatie\LaravelTwitterStreamingApi\TwitterStreamingApiFacade::class,
 
 

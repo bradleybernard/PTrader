@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Spatie\TwitterStreamingApi\PublicStream;
+use App\Jobs\PerformTrade;
 
 class ListenForTweets extends Command
 {
@@ -34,6 +35,12 @@ class ListenForTweets extends Command
             'bradleybernard' => '137867896',
         ];
 
+        $map = [];
+
+        foreach($ids as $user => $id) {
+            $map[$id] = 1;
+        }
+
         $twitter = [
             'access_token' => env('TWITTER_ACCESS_TOKEN'),
             'access_token_secret' => env('TWITTER_ACCESS_TOKEN_SECRET'),
@@ -46,9 +53,10 @@ class ListenForTweets extends Command
             $twitter['access_token_secret'],
             $twitter['consumer_key'],
             $twitter['consumer_secret']
-        )->whenTweets(implode(',', $ids), function($tweet) use ($ids) {
-            if(in_array($tweet['user']['id'], $ids)) {
+        )->whenTweets(implode(',', $ids), function($tweet) use ($ids, $map) {
+            if(isset($tweet['favorite_count']) && isset($map[$tweet['user']['id']])) {
                 echo \Carbon\Carbon::now() . " => {$tweet['user']['screen_name']} just tweeted {$tweet['text']}";
+                dispatch(new PerformTrade($tweet['user']['id']));
             }
         })->startListening();
     }
