@@ -16,6 +16,11 @@ class BetController extends ScrapeController
 
     protected $baseUri  = 'https://www.predictit.org/';
 
+    public function test() 
+    {
+        dispatch(new \App\Jobs\PerformTrade('822215679726100480'));
+    }
+
     public function placeBet($twitterId) 
     {
         $contract = $this->findBestContract($twitterId);
@@ -139,6 +144,6 @@ class BetController extends ScrapeController
             Log::error((string)$response->getBody());
         }
 
-        echo ((string)$response->getBody());
+        // echo ((string)$response->getBody());
     }
 }

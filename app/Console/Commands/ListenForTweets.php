@@ -32,7 +32,6 @@ class ListenForTweets extends Command
         $ids = [
             'realDonaldTrump' => '25073877',
             'potus' => '822215679726100480',
-            'bradleybernard' => '137867896',
         ];
 
         $map = [];
