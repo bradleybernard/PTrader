@@ -25,7 +25,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->call('App\Http\Controllers\Bet\LoginController@refreshSessions')
-            ->everyFiveMinutes()->name('RefreshSessions')->withoutOverlapping();
+            ->daily()->name('RefreshSessions')->withoutOverlapping();
     }
 
     /**
