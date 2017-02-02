@@ -24,6 +24,8 @@ class CreateMarketsTable extends Migration
             $table->string('ticker_symbol');
             $table->string('image');
             $table->string('url');
+            $table->datetime('date_start');
+            $table->datetime('date_end');
             $table->timestamps();
         });
     }

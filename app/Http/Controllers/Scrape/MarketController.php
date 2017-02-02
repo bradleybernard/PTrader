@@ -10,16 +10,10 @@ use Twitter;
 class MarketController extends ScrapeController
 {
     private $search = 'How many tweets will @';
+    private $timezone = 'EST';
 
     public function scrape()
     {
-        // \Carbon\Carbon::parse('noon Jan. 31 EST')
-        //     => Carbon\Carbon {  #655
-        //         +"date": "2017-01-31 12:00:00.000000",
-        //         +"timezone_type": 2,
-        //         +"timezone": "EST",
-        //     }
-        
         try {
             $response = $this->client->request('GET', 'all');
         } catch (ClientException $e) {
@@ -36,6 +30,9 @@ class MarketController extends ScrapeController
                 continue;
             }
 
+            $from = trim($this->getStringBetween($market->Name, 'from', 'to'))  . ' ' . $this->timezone;
+            $to = trim($this->getStringBetween($market->Name, 'to', '?')) . ' ' . $this->timezone;
+
             $markets[] = [
                 'market_id' => $market->ID,
                 'twitter_id' => $this->getTwitterId($market->Name),
@@ -46,6 +43,8 @@ class MarketController extends ScrapeController
                 'ticker_symbol' => $market->TickerSymbol,
                 'image' => $market->Image,
                 'url' => $market->URL,
+                'date_start' => \Carbon\Carbon::parse($from)->setTimezone('UTC'),
+                'date_end' => \Carbon\Carbon::parse($to)->setTimezone('UTC'),
                 'updated_at' => \Carbon\Carbon::now(),
                 'created_at' => \Carbon\Carbon::now(),
             ];
@@ -63,7 +62,7 @@ class MarketController extends ScrapeController
                     'status' => ($contract->Status == 'Open' ? true : false),
                     'image' => $contract->Image,
                     'url' => $contract->URL,
-                    'date_end' => \Carbon\Carbon::parse($contract->DateEnd),
+                    'date_end' => \Carbon\Carbon::parse($contract->DateEnd . ' EST')->setTimezone('UTC'),
                     'updated_at' => \Carbon\Carbon::now(),
                     'created_at' => \Carbon\Carbon::now(),
                 ]);
@@ -125,4 +124,16 @@ class MarketController extends ScrapeController
             return $row->twitter_id;
         }
     }
+
+    private function getStringBetween($string, $start, $end)
+    {
+        $string = ' ' . $string;
+        $ini = strpos($string, $start);
+        if ($ini == 0) return '';
+
+        $ini += strlen($start);
+        $len = strpos($string, $end, $ini) - $ini;
+        return substr($string, $ini, $len);
+    }
+
 }

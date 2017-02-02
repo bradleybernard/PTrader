@@ -13,7 +13,13 @@ class BetController extends ScrapeController
 
     public function test() 
     {
-        dispatch(new \App\Jobs\PerformTrade('822215679726100480'));
+        dispatch(new \App\Jobs\PerformTrade('822215679726100480', [
+            'twitter_id'        => '822215679726100480',
+            'tweet_id'          => '827214173025271811',
+            'text'              => 'Great meeting with Harly Davidson!',
+            'api_created_at'    => \Carbon\Carbon::now(),
+            'created_at'        => \Carbon\Carbon::now(),
+        ]));
     }
 
     public function placeBet($twitterId) 

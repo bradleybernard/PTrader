@@ -7,21 +7,24 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use DB;
 
 class PerformTrade implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $twitterId;
+    protected $data;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($twitterId)
+    public function __construct($twitterId, $data)
     {
         $this->twitterId = $twitterId;
+        $this->data = $data;
     }
 
     /**
@@ -31,6 +34,7 @@ class PerformTrade implements ShouldQueue
      */
     public function handle()
     {
+        DB::table('tweets')->insert($this->data);
         app('App\Http\Controllers\Bet\BetController')->placeBet($this->twitterId);
     }
 }

@@ -53,18 +53,25 @@ class ListenForTweets extends Command
             $twitter['consumer_key'],
             $twitter['consumer_secret']
         )->whenTweets(implode(',', $ids->pluck('twitter_id')->toArray()), function($tweet) use ($ids, $map) {
+
             $isTweet = isset($tweet['favorite_count']) && isset($map[$tweet['user']['id']]);
+            $isDelete = isset($tweet['delete']) && isset($map[$tweet['delete']['status']['user_id_str']]);
+
             if($isTweet) {
-                dispatch(new PerformTrade($tweet['user']['id']));
-                DB::table('tweets')->insert([
+                
+                dispatch(new PerformTrade($tweet['user']['id'], [
                     'twitter_id'        => $tweet['user']['id_str'],
                     'tweet_id'          => $tweet['id_str'],
                     'text'              => $tweet['text'],
                     'api_created_at'    => \Carbon\Carbon::parse($tweet['created_at']),
                     'created_at'        => \Carbon\Carbon::now(),
-                ]);
-                echo \Carbon\Carbon::now() . " => {$tweet['user']['screen_name']} just tweeted {$tweet['text']}";
+                ]));
+
+                echo \Carbon\Carbon::now() . " => {$tweet['user']['screen_name']} just tweeted {$tweet['text']}\n";
+            } else if($isDelete) {
+                DB::table('tweets')->where('tweet_id', $tweet['delete']['status']['id_str'])->delete();
             }
+
         })->startListening();
     }
 
