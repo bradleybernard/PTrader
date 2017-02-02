@@ -15,7 +15,7 @@ class TwitterController extends ScrapeController
 
         foreach($twitters as $twitter) {
             
-            $tweets = json_decode(Twitter::getUserTimeline(['user_id' => $twitter->twitter_id, 'count' => 100, 'format' => 'json']));
+            $tweets = json_decode(Twitter::getUserTimeline(['user_id' => $twitter->twitter_id, 'count' => 200, 'format' => 'json']));
             $insert = collect([]);
             
             foreach($tweets as $tweet) {

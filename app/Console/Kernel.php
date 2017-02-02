@@ -24,11 +24,14 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        $schedule->call('App\Http\Controller\Scrape\MarketController@scrape')
+            ->twiceDaily(0, 12);
+            
         $schedule->call('App\Http\Controllers\Bet\LoginController@refreshSessions')
-            ->daily()->name('RefreshSessions')->withoutOverlapping();
+            ->daily();
 
         $schedule->call('App\Http\Controllers\Scrape\TwitterController@importTweets')
-            ->hourly();
+            ->daily();
     }
 
     /**

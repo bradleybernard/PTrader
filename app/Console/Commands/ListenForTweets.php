@@ -52,15 +52,20 @@ class ListenForTweets extends Command
             $twitter['access_token_secret'],
             $twitter['consumer_key'],
             $twitter['consumer_secret']
-        // )->whenHears('a', function(array $tweet) {
-        //     if(isset($tweet['favorite_count']))
-        //         echo \Carbon\Carbon::now() . "{$tweet['user']['screen_name']} tweeted {$tweet['text']}\n";
-        // })->startListening();
         )->whenTweets(implode(',', $ids->pluck('twitter_id')->toArray()), function($tweet) use ($ids, $map) {
-            if(isset($tweet['favorite_count']) && isset($map[$tweet['user']['id']])) {
-                echo \Carbon\Carbon::now() . " => {$tweet['user']['screen_name']} just tweeted {$tweet['text']}";
+            $isTweet = isset($tweet['favorite_count']) && isset($map[$tweet['user']['id']]);
+            if($isTweet) {
                 dispatch(new PerformTrade($tweet['user']['id']));
+                DB::table('tweets')->insert([
+                    'twitter_id'        => $tweet['user']['id_str'],
+                    'tweet_id'          => $tweet['id_str'],
+                    'text'              => $tweet['text'],
+                    'api_created_at'    => \Carbon\Carbon::parse($tweet['created_at']),
+                    'created_at'        => \Carbon\Carbon::now(),
+                ]);
+                echo \Carbon\Carbon::now() . " => {$tweet['user']['screen_name']} just tweeted {$tweet['text']}";
             }
         })->startListening();
     }
+
 }

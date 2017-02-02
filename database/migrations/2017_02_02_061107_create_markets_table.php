@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTwitterTable extends Migration
+class CreateMarketsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,17 @@ class CreateTwitterTable extends Migration
      */
     public function up()
     {
-        Schema::create('twitter', function (Blueprint $table) {
+        Schema::create('markets', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('username');
+            $table->integer('market_id')->unsigned();
             $table->string('twitter_id');
+            $table->boolean('status');
+            $table->boolean('active');
+            $table->string('name');
+            $table->string('short_name');
+            $table->string('ticker_symbol');
+            $table->string('image');
+            $table->string('url');
             $table->timestamps();
         });
     }
@@ -28,6 +35,6 @@ class CreateTwitterTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('twitter');
+        Schema::dropIfExists('markets');
     }
 }

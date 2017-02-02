@@ -18,6 +18,7 @@ class CreateTradesTable extends Migration
             $table->bigInteger('account_id')->unsigned();
             $table->bigInteger('session_id')->unsigned();
             $table->bigInteger('order_id')->unsigned();
+            $table->bigInteger('market_id')->unsigned();
             $table->integer('contract_id')->unsigned();
             $table->string('type');
             $table->integer('quantity')->unsigned();

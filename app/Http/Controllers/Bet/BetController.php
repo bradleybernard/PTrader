@@ -9,11 +9,6 @@ use Log;
 
 class BetController extends ScrapeController
 {
-    private $lookup = [
-        '25073877' => 'TRUMPTWEETS.20817',
-        '822215679726100480' => 'POTUSTWEETS.020717',
-    ];
-
     protected $baseUri  = 'https://www.predictit.org/';
 
     public function test() 
@@ -23,7 +18,8 @@ class BetController extends ScrapeController
 
     public function placeBet($twitterId) 
     {
-        $contract = $this->findBestContract($twitterId);
+        $market = $this->findMarket($twitterId);
+        $contract = $this->findBestContract($market);
 
         if(!$contract) {
             return;
@@ -32,10 +28,29 @@ class BetController extends ScrapeController
         $this->betOnContract($contract);
     }
 
-    private function findBestContract($twitterId) 
+    private function findMarket($twitterId)
     {
+        $market = DB::table('markets')->select(['ticker_symbol', 'market_id'])
+                    ->where('twitter_id', $twitterId)
+                    ->where('active', true)
+                    ->where('status', true)
+                    ->first();
+
+        if(!$market) {
+            return null;
+        }
+
+        return $market;
+    }
+
+    private function findBestContract($market) 
+    {
+        if(!$market) {
+            return null;
+        }
+
         try {
-            $response = $this->client->request('GET', 'api/marketdata/ticker/' . $this->lookup[$twitterId]);
+            $response = $this->client->request('GET', 'api/marketdata/ticker/' . $market->ticker_symbol);
         } catch (ClientException $e) {
             Log::error($e->getMessage()); return;
         } catch (ServerException $e) {
@@ -61,14 +76,20 @@ class BetController extends ScrapeController
         return (object) [
             'contractId' => $contractId,
             'bestBuyYesCost' => $bestBuyYesCost,
+            'marketId' => $market->market_id,
             'type' => 1,
         ];
     }
 
+    private function chooseAccount()
+    {
+        return DB::table('accounts')->select('id')->where('id', 1)->first();
+    }
+
     private function betOnContract($contract) 
     {
-        $accountId = 1;
-        $session = DB::table('sessions')->where('account_id', $accountId)->where('active', true)->first();
+        $account = $this->chooseAccount();
+        $session = DB::table('sessions')->where('account_id', $account->id)->where('active', true)->first();
         if(!$session) {
             return;
         }
@@ -85,29 +106,6 @@ class BetController extends ScrapeController
 
         $html = new \Htmldom((string)$response->getBody());
         $token = $html->find('#BuySubmit', 0)->find('input[name="__RequestVerificationToken"]', 0)->value;
-
-        // dd($token);
-
-        // try {
-        //     $response = $this->client->request('POST', 'Trade/ConfirmTrade', [
-        //         'cookies' => $jar,
-        //         'form_params' => [ 
-        //             '__RequestVerificationToken'    => $token,
-        //             'ContractId'                    => $contract->contractId,
-        //             'TradeType'                     => 1,
-        //             'Quantity'                      => 1,
-        //             'PricePerShare'                 => $contract->bestBuyYesCost,
-        //             'X-Requested-With'              => 'XMLHttpRequest',
-        //         ],
-        //     ]);
-        // } catch (ClientException $e) {
-        //     Log::error($e->getMessage()); return;
-        // } catch (ServerException $e) {
-        //     Log::error($e->getMessage()); return;
-        // }
-
-        // $html = new \Htmldom((string)$response->getBody());
-        // $token = $html->find('#BuyTradeSubmit', 0)->find('input[name="__RequestVerificationToken"]', 0)->value;
 
         try {
             $response = $this->client->request('POST', 'Trade/SubmitTrade', [
@@ -128,11 +126,11 @@ class BetController extends ScrapeController
         }
 
         if($response->getStatusCode() == 200) {
-            preg_match("/orderId: '([0-9]+)'/", ((string)$response->getBody()), $matches);
             DB::table('trades')->insert([
                 'account_id'        => $session->account_id,
                 'session_id'        => $session->id,
-                'order_id'          => $matches[1],
+                'order_id'          => $this->getOrderId($response),
+                'market_id'         => $contract->marketId,
                 'contract_id'       => $contract->contractId,
                 'type'              => $contract->type,
                 'quantity'          => 1,
@@ -143,5 +141,11 @@ class BetController extends ScrapeController
         } else {
             Log::error((string)$response->getBody());
         }
+    }
+
+    private function getOrderId(&$response)
+    {
+        preg_match("/orderId: '([0-9]+)'/", ((string)$response->getBody()), $matches);
+        return $matches[1];
     }
 }
