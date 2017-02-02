@@ -12,6 +12,7 @@
         "pda/pheanstalk": "~3.0",
         "predis/predis": "~1.0",
         "spatie/twitter-streaming-api": "dev-master",
+        "thujohn/twitter": "^2.2",
         "yangqi/htmldom": "dev-master"
     },
     "require-dev": {

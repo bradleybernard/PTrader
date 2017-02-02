@@ -26,6 +26,9 @@ class Kernel extends ConsoleKernel
     {
         $schedule->call('App\Http\Controllers\Bet\LoginController@refreshSessions')
             ->daily()->name('RefreshSessions')->withoutOverlapping();
+
+        $schedule->call('App\Http\Controllers\Scrape\TwitterController@importTweets')
+            ->hourly();
     }
 
     /**

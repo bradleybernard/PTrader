@@ -143,7 +143,5 @@ class BetController extends ScrapeController
         } else {
             Log::error((string)$response->getBody());
         }
-
-        // echo ((string)$response->getBody());
     }
 }

@@ -52,6 +52,10 @@ class ListenForTweets extends Command
             $twitter['access_token_secret'],
             $twitter['consumer_key'],
             $twitter['consumer_secret']
+        // )->whenHears('a', function(array $tweet) {
+        //     if(isset($tweet['favorite_count']))
+        //         echo \Carbon\Carbon::now() . "{$tweet['user']['screen_name']} tweeted {$tweet['text']}\n";
+        // })->startListening();
         )->whenTweets(implode(',', $ids->pluck('twitter_id')->toArray()), function($tweet) use ($ids, $map) {
             if(isset($tweet['favorite_count']) && isset($map[$tweet['user']['id']])) {
                 echo \Carbon\Carbon::now() . " => {$tweet['user']['screen_name']} just tweeted {$tweet['text']}";

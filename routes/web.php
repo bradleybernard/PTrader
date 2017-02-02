@@ -14,3 +14,4 @@
 Route::get('bet/{twitterId}', 'Bet\BetController@placeBet');
 Route::get('login', 'Bet\LoginController@refreshSessions');
 Route::get('dispatch', 'Bet\BetController@test');
+Route::get('twitter', 'Scrape\TwitterController@importTweets');

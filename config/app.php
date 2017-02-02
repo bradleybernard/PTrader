@@ -12,7 +12,7 @@ return [
     | any other location as required by the application or its packages.
     */
 
-    'name' => 'Laravel',
+    'name' => 'PTrader',
 
     /*
     |--------------------------------------------------------------------------
@@ -178,6 +178,7 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         Yangqi\Htmldom\HtmldomServiceProvider::class,
+        Thujohn\Twitter\TwitterServiceProvider::class,
         // Spatie\LaravelTwitterStreamingApi\TwitterStreamingApiServiceProvider::class,
 
     ],
@@ -230,6 +231,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
 
          'Htmldom' => Yangqi\Htmldom\Htmldom::class,
+         'Twitter' => Thujohn\Twitter\Facades\Twitter::class,
         // 'TwitterStreamingApi' => Spatie\LaravelTwitterStreamingApi\TwitterStreamingApiFacade::class,
 
 
