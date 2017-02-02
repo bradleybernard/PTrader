@@ -18,6 +18,9 @@ class CreateAccountsTable extends Migration
             $table->string('name');
             $table->string('email');
             $table->string('password');
+            $table->decimal('available', 15, 2)->default(0.00);
+            $table->decimal('gain_loss', 15, 2)->default(0.00);
+            $table->decimal('invested',  15, 2)->default(0.00);
             $table->timestamps();
         });
     }

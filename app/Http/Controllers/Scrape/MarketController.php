@@ -84,14 +84,21 @@ class MarketController extends ScrapeController
             DB::table('contracts')->insert($filtered->toArray());
         }
 
-        DB::table('markets')->update(['active' => false]);
+        DB::table('markets')->where('active', true)->update([
+            'active' => false, 
+            'updated_at' => \Carbon\Carbon::now()
+        ]);
+
         if(count($markets) > 0) {
             foreach($markets as $market) {
                 $exists = DB::table('markets')->where('market_id', $market['market_id'])->count();
                 if($exists == 0) {
                     DB::table('markets')->insert($market);
                 } else {
-                    DB::table('markets')->where('market_id', $market['market_id'])->update(['active' => true]);
+                    DB::table('markets')->where('market_id', $market['market_id'])->update([
+                        'active' => true, 
+                        'updated_at' => \Carbon\Carbon::now()
+                    ]);
                 }
             }
         }
