@@ -12,7 +12,7 @@ class PerformTrade implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $twitterId;
+    protected $twitterId;
 
     /**
      * Create a new job instance.
