@@ -13,6 +13,13 @@ class MarketController extends ScrapeController
 
     public function scrape()
     {
+        // \Carbon\Carbon::parse('noon Jan. 31 EST')
+        //     => Carbon\Carbon {  #655
+        //         +"date": "2017-01-31 12:00:00.000000",
+        //         +"timezone_type": 2,
+        //         +"timezone": "EST",
+        //     }
+        
         try {
             $response = $this->client->request('GET', 'all');
         } catch (ClientException $e) {
