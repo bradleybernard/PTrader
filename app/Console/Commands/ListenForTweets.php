@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Spatie\TwitterStreamingApi\PublicStream;
 use App\Jobs\PerformTrade;
+use DB;
 
 class ListenForTweets extends Command
 {
@@ -29,16 +30,14 @@ class ListenForTweets extends Command
      */
     public function handle()
     {
-        $ids = [
-            'realDonaldTrump' => '25073877',
-            'potus' => '822215679726100480',
-            // 'bradleybernard' => '137867896',
-        ];
+        $ids = DB::table('twitter')->select('twitter_id')->get();
+        if(count($ids) == 0) {
+            return $this->error('No Twitter accounts exist in twitter table.');
+        }
 
         $map = [];
-
-        foreach($ids as $user => $id) {
-            $map[$id] = 1;
+        foreach($ids as $twitter) {
+            $map[$twitter->twitter_id] = 1;
         }
 
         $twitter = [
@@ -53,7 +52,7 @@ class ListenForTweets extends Command
             $twitter['access_token_secret'],
             $twitter['consumer_key'],
             $twitter['consumer_secret']
-        )->whenTweets(implode(',', $ids), function($tweet) use ($ids, $map) {
+        )->whenTweets(implode(',', $ids->pluck('twitter_id')->toArray()), function($tweet) use ($ids, $map) {
             if(isset($tweet['favorite_count']) && isset($map[$tweet['user']['id']])) {
                 echo \Carbon\Carbon::now() . " => {$tweet['user']['screen_name']} just tweeted {$tweet['text']}";
                 dispatch(new PerformTrade($tweet['user']['id']));
