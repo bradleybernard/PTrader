@@ -11,6 +11,7 @@ use App\Market;
 use App\Contract;
 use App\Trade;
 use App\Session;
+use App\Tweet;
 
 class BetController extends ScrapeController
 {
@@ -18,13 +19,14 @@ class BetController extends ScrapeController
 
     public function test() 
     {
-        dispatch(new \App\Jobs\PerformTrade('822215679726100480', [
-            'twitter_id'        => '822215679726100480',
-            'tweet_id'          => '827214173025271811',
-            'text'              => 'Great meeting with Harly Davidson!',
-            'api_created_at'    => \Carbon\Carbon::now(),
-            'created_at'        => \Carbon\Carbon::now(),
-        ]));
+        // [
+        //     'user' => ['id_str' => '25073877'],
+        //     'id_str' => '827303793226301444',
+        //     'text' => "'Trump taps first woman to CIA second in command'\nhttps://t.co/15yzhsH6Qq",
+        //     'created_at' => \Carbon\Carbon::now(),
+        // ];
+
+        dispatch(new \App\Jobs\PerformTrade(Tweet::find(1)));
     }
 
     public function placeBet($twitterId) 

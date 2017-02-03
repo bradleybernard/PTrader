@@ -5,7 +5,8 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Spatie\TwitterStreamingApi\PublicStream;
 use App\Jobs\PerformTrade;
-use DB;
+use App\Jobs\DeleteTweet;
+use App\Twitter;
 
 class ListenForTweets extends Command
 {
@@ -30,7 +31,7 @@ class ListenForTweets extends Command
      */
     public function handle()
     {
-        $ids = DB::table('twitter')->select('twitter_id')->get();
+        $ids = Twitter::select('twitter_id')->get();
         if(count($ids) == 0) {
             return $this->error('No Twitter accounts exist in twitter table.');
         }
@@ -58,18 +59,19 @@ class ListenForTweets extends Command
             $isDelete = isset($tweet['delete']) && isset($map[$tweet['delete']['status']['user_id_str']]);
 
             if($isTweet) {
-                
-                dispatch(new PerformTrade($tweet['user']['id'], [
+
+                $tweet = Tweet::create([
                     'twitter_id'        => $tweet['user']['id_str'],
                     'tweet_id'          => $tweet['id_str'],
                     'text'              => $tweet['text'],
                     'api_created_at'    => \Carbon\Carbon::parse($tweet['created_at']),
-                    'created_at'        => \Carbon\Carbon::now(),
-                ]));
+                ]);
+
+                dispatch(new PerformTrade($tweet));
 
                 echo \Carbon\Carbon::now() . " => {$tweet['user']['screen_name']} just tweeted {$tweet['text']}\n";
             } else if($isDelete) {
-                DB::table('tweets')->where('tweet_id', $tweet['delete']['status']['id_str'])->delete();
+                dispatch(new DeleteTweet($tweet['delete']['status']['id_str']));
             }
 
         })->startListening();

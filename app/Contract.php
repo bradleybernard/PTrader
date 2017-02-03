@@ -61,20 +61,22 @@ class Contract extends Model
             Log::error($e->getMessage()); return;
         }
 
-        if($response->getStatusCode() == 200) {
-            Trade::create([
-                'account_id'        => $session->account_id,
-                'session_id'        => $session->id,
-                'order_id'          => $this->getOrderId($response),
-                'market_id'         => $this->market_id,
-                'contract_id'       => $this->contract_id,
-                'type'              => $this->type,
-                'quantity'          => 1,
-                'price_per_share'   => $this->best_buy_yes_cost,
-            ]);
-        } else {
+        if($response->getStatusCode() != 200) {
             Log::error((string)$response->getBody());
         }
+
+        Trade::create([
+            'account_id'        => $session->account_id,
+            'session_id'        => $session->id,
+            'order_id'          => $this->getOrderId($response),
+            'market_id'         => $this->market_id,
+            'contract_id'       => $this->contract_id,
+            'type'              => $this->type,
+            'quantity'          => 1,
+            'price_per_share'   => $this->best_buy_yes_cost,
+        ]);
+
+        $account->createClient()->refreshMoney();
     }
 
     private function getOrderId(&$response)

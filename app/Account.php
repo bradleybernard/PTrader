@@ -75,7 +75,7 @@ class Account extends Model
         ]);
     }
 
-    public function refreshMoney($jar)
+    public function refreshMoney($jar = NULL)
     {
         if(!$jar) {
             $session = Session::select('cookie_file')->where('account_id', $this->id)->where('active', true)->first();
