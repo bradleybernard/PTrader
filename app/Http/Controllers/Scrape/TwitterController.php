@@ -4,23 +4,25 @@ namespace App\Http\Controllers\Scrape;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Scrape\ScrapeController;
-use Twitter;
-use DB;
+use App\Twitter;
+use App\Tweet;
+use TwitterAPI;
 
 class TwitterController extends ScrapeController
 {
     public function importTweets()
     {
-        $twitters = DB::table('twitter')->select('twitter_id')->get();
+        $twitters = Twitter::all()->pluck('twitter_id');
 
-        foreach($twitters as $twitter) {
+        foreach($twitters as $twitterId) {
             
-            $tweets = json_decode(Twitter::getUserTimeline(['user_id' => $twitter->twitter_id, 'count' => 200, 'format' => 'json']));
+            $tweets = TwitterAPI::getUserTimeline(['user_id' => $twitterId, 'count' => 200, 'format' => 'json']);
+            $tweets = json_decode($tweets);
             $insert = collect([]);
             
             foreach($tweets as $tweet) {
                 $insert->push([
-                    'twitter_id'        => $twitter->twitter_id,
+                    'twitter_id'        => $twitterId,
                     'tweet_id'          => $tweet->id_str,
                     'text'              => $tweet->text,
                     'api_created_at'    => \Carbon\Carbon::parse($tweet->created_at),
@@ -29,7 +31,7 @@ class TwitterController extends ScrapeController
             }
 
             $tweetIds = $insert->pluck('tweet_id');
-            $exists = collect(DB::table('tweets')->whereIn('tweet_id', $tweetIds->toArray())->select('tweet_id')->get());
+            $exists = collect(Tweet::whereIn('tweet_id', $tweetIds->toArray())->select('tweet_id')->get());
 
             if($exists->count() > 0)
                 $exists = $exists->pluck('tweet_id');
@@ -42,7 +44,7 @@ class TwitterController extends ScrapeController
                 }
             });
 
-            DB::table('tweets')->insert($filtered->toArray());
+            Tweet::insert($filtered->toArray());
         }
     }
 }

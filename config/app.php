@@ -231,7 +231,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
 
          'Htmldom' => Yangqi\Htmldom\Htmldom::class,
-         'Twitter' => Thujohn\Twitter\Facades\Twitter::class,
+         'TwitterAPI' => Thujohn\Twitter\Facades\Twitter::class,
         // 'TwitterStreamingApi' => Spatie\LaravelTwitterStreamingApi\TwitterStreamingApiFacade::class,
 
 

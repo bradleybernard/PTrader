@@ -27,7 +27,7 @@ class Kernel extends ConsoleKernel
         $schedule->call('App\Http\Controller\Scrape\MarketController@scrape')
             ->twiceDaily(0, 12);
             
-        $schedule->call('App\Http\Controllers\Bet\LoginController@refreshSessions')
+        $schedule->call('App\Http\Controllers\Bet\LoginController@createNewAccountSessions')
             ->daily();
 
         $schedule->call('App\Http\Controllers\Scrape\TwitterController@importTweets')

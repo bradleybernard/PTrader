@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Scrape;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Scrape\ScrapeController;
-use DB;
-use Twitter;
+use TwitterAPI;
+
+use App\Market;
+use App\Contract;
+use App\Twitter;
 
 class MarketController extends ScrapeController
 {
@@ -68,7 +71,7 @@ class MarketController extends ScrapeController
                 ]);
             }
 
-            $exists = collect(DB::table('contracts')->whereIn('contract_id', $contracts->pluck('contract_id'))->get());
+            $exists = collect(Contract::whereIn('contract_id', $contracts->pluck('contract_id'))->get());
 
             if($exists->count() > 0)
                 $exists = $exists->pluck('contract_id');
@@ -81,41 +84,29 @@ class MarketController extends ScrapeController
                 }
             });
 
-            DB::table('contracts')->insert($filtered->toArray());
+            Contract::insert($filtered->toArray());
         }
 
-        DB::table('markets')->where('active', true)->update([
-            'active' => false, 
-            'updated_at' => \Carbon\Carbon::now()
-        ]);
+        Market::where('active', true)->update(['active' => false]);
 
         if(count($markets) > 0) {
             foreach($markets as $market) {
-                $exists = DB::table('markets')->where('market_id', $market['market_id'])->count();
-                if($exists == 0) {
-                    DB::table('markets')->insert($market);
-                } else {
-                    DB::table('markets')->where('market_id', $market['market_id'])->update([
-                        'active' => true, 
-                        'updated_at' => \Carbon\Carbon::now()
-                    ]);
-                }
+                $model = Market::firstOrNew(['market_id' => $market['market_id']]);
+                $model->fill($market)->save();
             }
         }
     }
 
     private function insertTwitter($username) 
     {
-        $lookup = Twitter::getUsersLookup(['screen_name' => $username]);
+        $lookup = TwitterAPI::getUsersLookup(['screen_name' => $username]);
 
-        DB::table('twitter')->insert([
+        $twitter = Twitter::create([
             'username'      => $lookup[0]->screen_name,
             'twitter_id'    => $lookup[0]->id_str,
-            'created_at'    => \Carbon\Carbon::now(),
-            'updated_at'    => \Carbon\Carbon::now(),
         ]);
 
-        return $lookup;
+        return $twitter->username;
     }
 
     private function getTwitterId($string)
@@ -123,10 +114,10 @@ class MarketController extends ScrapeController
         preg_match("/@([A-Za-z0-9_]{1,15})/", $string, $matches);
         $username = $matches[1];
 
-        $row = DB::table('twitter')->where('username', $username)->first();
+        $row = Twitter::where('username', $username)->first();
 
         if(!$row) {
-            return $this->insertTwitter($username)[0]->id_str;
+            return $this->insertTwitter($username);
         } else {
             return $row->twitter_id;
         }
