@@ -7,6 +7,7 @@ use Spatie\TwitterStreamingApi\PublicStream;
 use App\Jobs\PerformTrade;
 use App\Jobs\DeleteTweet;
 use App\Twitter;
+use App\Tweet;
 use Log;
 
 class ListenForTweets extends Command
