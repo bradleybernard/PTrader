@@ -33,6 +33,8 @@ class ListenForTweets extends Command
      */
     public function handle()
     {
+        app('\App\Http\Controllers\Scrape\TwitterController')->importTweets();
+        
         $ids = Twitter::select('twitter_id')->get();
         if(count($ids) == 0) {
             return $this->error('No Twitter accounts exist in twitter table.');

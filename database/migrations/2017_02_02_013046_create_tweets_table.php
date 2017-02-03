@@ -19,7 +19,7 @@ class CreateTweetsTable extends Migration
             $table->string('tweet_id');
             $table->text('text');
             $table->datetime('api_created_at');
-            $table->datetime('created_at');
+            $table->timestamps();
         });
     }
 
