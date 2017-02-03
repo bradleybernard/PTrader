@@ -78,22 +78,23 @@ class Account extends Model
     public function refreshMoney($jar = NULL)
     {
         if(!$jar) {
-            $session = Session::select('cookie_file')->where('account_id', $this->id)->where('active', true)->first();
+            $session = $this->session;
             $jar = new \GuzzleHttp\Cookie\FileCookieJar(storage_path($session->cookie_file), true);
         }
 
         try {
-            $response = $this->client->request('GET', 'Profile/MyShares', ['cookies' => $jar]);
+            $response = $this->client->request('GET', 'PrivateData/_UserFundsMainNav', ['cookies' => $jar]);
         } catch (ClientException $e) {
             Log::error($e->getMessage()); return;
         } catch (ServerException $e) {
             Log::error($e->getMessage()); return;
         }
 
-        $html = new \Htmldom((string)$response->getBody());
-        $gainLoss = str_replace('$', '', trim($html->find('#acct-value', 0)->find('span', 0)->plaintext));
-        $invested = str_replace('$', '', trim($html->find('#committed', 0)->find('span', 0)->plaintext));
-        $available = str_replace('$', '', trim($html->find('#avail-low', 0)->find('span', 0)->plaintext));
+        $response = json_decode((string)$response->getBody());
+
+        $gainLoss = (double)str_replace('$', '', $response->SharesText);
+        $invested = (double)str_replace('$', '', $response->PortfolioText);
+        $available = (double)str_replace('$', '', $response->BalanceText);
 
         $this->update([
             'available' => $available,

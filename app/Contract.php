@@ -8,7 +8,6 @@ use App\Trade;
 use App\Session;
 use Log;
 
-
 class Contract extends Model
 {
     use Traits\SendsRequests;
@@ -25,15 +24,14 @@ class Contract extends Model
     {
         $this->createClient();
 
-        $session = Session::where('account_id', $account->id)->where('active', true)->first();
-        if(!$session) {
+        if(!$session = $account->session) {
             return;
         }
 
         $jar = new \GuzzleHttp\Cookie\FileCookieJar(storage_path($session->cookie_file), true);
 
         try {
-            $response = $this->client->request('GET', 'Trade/LoadLong?contractId=' . $this->contract_id, ['cookies' => $jar]);
+            $response = $this->client->request('GET', 'Trade/Load' . $this->urlType() .  '?contractId=' . $this->contract_id, ['cookies' => $jar]);
         } catch (ClientException $e) {
             Log::error($e->getMessage()); return;
         } catch (ServerException $e) {
@@ -41,7 +39,7 @@ class Contract extends Model
         }
 
         $html = new \Htmldom((string)$response->getBody());
-        $token = $html->find('#BuySubmit', 0)->find('input[name="__RequestVerificationToken"]', 0)->value;
+        $token = $html->find('input[name="__RequestVerificationToken"]', 0)->value;
 
         try {
             $response = $this->client->request('POST', 'Trade/SubmitTrade', [
@@ -51,7 +49,7 @@ class Contract extends Model
                     'BuySellViewModel.ContractId'       => $this->contract_id,
                     'BuySellViewModel.TradeType'        => $this->type,
                     'BuySellViewModel.Quantity'         => 1,
-                    'BuySellViewModel.PricePerShare'    => $this->best_buy_yes_cost,
+                    'BuySellViewModel.PricePerShare'    => ($this->type == 0 ? $this->best_buy_no_cost : $this->best_buy_yes_cost),
                     'X-Requested-With'                  => 'XMLHttpRequest',
                 ],
             ]);
@@ -73,7 +71,7 @@ class Contract extends Model
             'contract_id'       => $this->contract_id,
             'type'              => $this->type,
             'quantity'          => 1,
-            'price_per_share'   => $this->best_buy_yes_cost,
+            'price_per_share'   => ($this->type == 0 ? $this->best_buy_no_cost : $this->best_buy_yes_cost),
         ]);
 
         $account->createClient()->refreshMoney();
@@ -83,5 +81,10 @@ class Contract extends Model
     {
         preg_match("/orderId: '([0-9]+)'/", ((string)$response->getBody()), $matches);
         return $matches[1];
+    }
+
+    private function urlType()
+    {
+        return $this->type == 0 ? 'Short' : 'Long';
     }
 }

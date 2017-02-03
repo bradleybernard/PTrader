@@ -28,21 +28,20 @@ class BetController extends ScrapeController
             return;
         }
 
-        if(!$contract = $market->findBestContract()) {
+        if(!$contracts = $market->findNoContracts()) {
             return;
         }
 
         $account = $this->chooseAccount();
 
-        if(!$contract->bet($account)) {
-            return;
+        foreach($contracts as $contract) {
+            $contract->bet($account);
         }
     }
 
     private function findMarket($twitterId)
     {
-        $market = Market::select(['ticker_symbol', 'market_id'])
-                    ->where('twitter_id', $twitterId)
+        $market = Market::where('twitter_id', $twitterId)
                     ->where('active', true)
                     ->where('status', true)
                     ->first();
