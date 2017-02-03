@@ -6,7 +6,7 @@ use \GuzzleHttp\Client;
 
 trait SendsRequests {
 
-    protected $client;
+    protected $client = null;
     protected $options = [];
 
     public function createClient()

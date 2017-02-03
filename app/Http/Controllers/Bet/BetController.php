@@ -19,13 +19,6 @@ class BetController extends ScrapeController
 
     public function test() 
     {
-        // [
-        //     'user' => ['id_str' => '25073877'],
-        //     'id_str' => '827303793226301444',
-        //     'text' => "'Trump taps first woman to CIA second in command'\nhttps://t.co/15yzhsH6Qq",
-        //     'created_at' => \Carbon\Carbon::now(),
-        // ];
-
         dispatch(new \App\Jobs\PerformTrade(Tweet::find(1)));
     }
 
