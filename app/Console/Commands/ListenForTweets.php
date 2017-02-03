@@ -7,6 +7,7 @@ use Spatie\TwitterStreamingApi\PublicStream;
 use App\Jobs\PerformTrade;
 use App\Jobs\DeleteTweet;
 use App\Twitter;
+use Log;
 
 class ListenForTweets extends Command
 {
@@ -68,8 +69,7 @@ class ListenForTweets extends Command
                 ]);
 
                 dispatch(new PerformTrade($tweet));
-
-                echo \Carbon\Carbon::now() . " => {$tweet['user']['screen_name']} just tweeted {$tweet['text']}\n";
+                //Log::info("{$tweet['user']['screen_name']} just tweeted {$tweet['text']}");
             } else if($isDelete) {
                 dispatch(new DeleteTweet($tweet['delete']['status']['id_str']));
             }
