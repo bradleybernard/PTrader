@@ -11,12 +11,10 @@ trait SendsRequests {
 
     public function createClient()
     {
-        if($this->client) {
-            return $this;
+        if(!$this->client) { 
+            $options = array_merge(['base_uri'  => $this->baseUri, 'headers' => $this->headers()], $this->options);
+            $this->client = new Client($options);
         }
-        
-        $options = array_merge(['base_uri'  => $this->baseUri, 'headers' => $this->headers()], $this->options);
-        $this->client = new Client($options);
 
         return $this;
     }

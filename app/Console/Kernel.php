@@ -25,13 +25,13 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->call('App\Http\Controller\Scrape\MarketController@scrape')
-            ->twiceDaily(0, 12);
+            ->hourly();
             
         $schedule->call('App\Http\Controllers\Bet\LoginController@createNewAccountSessions')
-            ->daily();
+            ->twiceDaily(0, 12);
 
         $schedule->call('App\Http\Controllers\Scrape\TwitterController@importTweets')
-            ->daily();
+            ->hourly();
     }
 
     /**
