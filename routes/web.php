@@ -11,6 +11,7 @@
 |
 */
 
+Route::get('/stats', 'Stats\StatsController@showStats');
 Route::get('bet/{twitterId}', 'Bet\BetController@placeBet');
 Route::get('login', 'Bet\LoginController@createNewAccountSessions');
 Route::get('dispatch', 'Bet\BetController@test');

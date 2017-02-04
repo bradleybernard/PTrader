@@ -13,7 +13,7 @@ class Market extends Model
 
     protected $guarded = [];
     protected $baseUri  = 'https://www.predictit.org/';
-
+    
     public function contracts()
     {
         return $this->hasMany('App\Contract', 'market_id', 'market_id');
