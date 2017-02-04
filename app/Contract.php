@@ -41,7 +41,9 @@ class Contract extends Model
         $html = new \Htmldom((string)$response->getBody());
         $token = $html->find('input[name="__RequestVerificationToken"]', 0)->value;
 
-        $quantity = (int)floor($account->available / ($this->type == 0 ? $this->best_buy_no_cost : $this->best_buy_yes_cost));
+        $price = ($this->type == 0 ? $this->best_buy_no_cost : $this->best_buy_yes_cost);
+        // $quantity = 1;
+        $quantity = (int) floor($account->available / $price);
 
         try {
             $response = $this->client->request('POST', 'Trade/SubmitTrade', [
@@ -51,7 +53,7 @@ class Contract extends Model
                     'BuySellViewModel.ContractId'       => $this->contract_id,
                     'BuySellViewModel.TradeType'        => $this->type,
                     'BuySellViewModel.Quantity'         => $quantity,
-                    'BuySellViewModel.PricePerShare'    => ($this->type == 0 ? $this->best_buy_no_cost : $this->best_buy_yes_cost),
+                    'BuySellViewModel.PricePerShare'    => $price,
                     'X-Requested-With'                  => 'XMLHttpRequest',
                 ],
             ]);
@@ -62,7 +64,7 @@ class Contract extends Model
         }
 
         if($response->getStatusCode() != 200) {
-            Log::error((string)$response->getBody());
+            Log::error((string)$response->getBody()); return;
         }
 
         Trade::create([
@@ -73,7 +75,8 @@ class Contract extends Model
             'contract_id'       => $this->contract_id,
             'type'              => $this->type,
             'quantity'          => $quantity,
-            'price_per_share'   => ($this->type == 0 ? $this->best_buy_no_cost : $this->best_buy_yes_cost),
+            'price_per_share'   => $price,
+            'total'             => ($quantity * $price),
         ]);
 
         $account->createClient()->refreshMoney();
@@ -82,6 +85,10 @@ class Contract extends Model
     private function getOrderId(&$response)
     {
         preg_match("/orderId: '([0-9]+)'/", ((string)$response->getBody()), $matches);
+        if(!isset($matches[1])) {
+            return null;
+        }
+
         return $matches[1];
     }
 
