@@ -55,6 +55,6 @@ class BetController extends ScrapeController
 
     private function chooseAccount()
     {
-        return Account::select('id')->where('id', 1)->first();
+        return Account::where('id', 1)->first();
     }
 }

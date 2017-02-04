@@ -57,11 +57,26 @@ class Account extends Model
 
         $response = json_decode((string)$response->getBody());
         if($response->IsSuccess === true) {
+            $this->removeExpired();
             $this->insertSession($file);
             $this->refreshMoney($jar);
         } else {
             Log::error("Login failed for accountId: $this->id");
         }
+    }
+
+    public function removeExpired()
+    {
+        $expired = Session::where('account_id', $this->id)->where('expires_after', '<=', \Carbon\Carbon::now())->get();
+        if($expired->count() == 0) {
+            return;
+        }
+
+        foreach($expired as $expire) {
+            @unlink(storage_path($expire->cookie_file));
+        }
+
+        Session::whereIn('id', $expired->pluck('id')->toArray())->delete();
     }
 
     public function insertSession($file)
@@ -72,6 +87,7 @@ class Account extends Model
             'account_id'    => $this->id,
             'cookie_file'   => $file,
             'active'        => true,
+            'expires_after' => \Carbon\Carbon::now()->addDays(1),
         ]);
     }
 

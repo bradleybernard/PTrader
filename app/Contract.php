@@ -41,6 +41,8 @@ class Contract extends Model
         $html = new \Htmldom((string)$response->getBody());
         $token = $html->find('input[name="__RequestVerificationToken"]', 0)->value;
 
+        $quantity = (int)floor($account->available / ($this->type == 0 ? $this->best_buy_no_cost : $this->best_buy_yes_cost));
+
         try {
             $response = $this->client->request('POST', 'Trade/SubmitTrade', [
                 'cookies' => $jar,
@@ -48,7 +50,7 @@ class Contract extends Model
                     '__RequestVerificationToken'        => $token,
                     'BuySellViewModel.ContractId'       => $this->contract_id,
                     'BuySellViewModel.TradeType'        => $this->type,
-                    'BuySellViewModel.Quantity'         => 1,
+                    'BuySellViewModel.Quantity'         => $quantity,
                     'BuySellViewModel.PricePerShare'    => ($this->type == 0 ? $this->best_buy_no_cost : $this->best_buy_yes_cost),
                     'X-Requested-With'                  => 'XMLHttpRequest',
                 ],
@@ -70,7 +72,7 @@ class Contract extends Model
             'market_id'         => $this->market_id,
             'contract_id'       => $this->contract_id,
             'type'              => $this->type,
-            'quantity'          => 1,
+            'quantity'          => $quantity,
             'price_per_share'   => ($this->type == 0 ? $this->best_buy_no_cost : $this->best_buy_yes_cost),
         ]);
 
