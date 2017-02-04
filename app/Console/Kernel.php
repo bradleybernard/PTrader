@@ -24,7 +24,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call('App\Http\Controller\Scrape\MarketController@scrape')
+        $schedule->call('App\Http\Controllers\Scrape\MarketController@scrape')
             ->hourly();
             
         $schedule->call('App\Http\Controllers\Bet\LoginController@createNewAccountSessions')
