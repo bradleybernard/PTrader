@@ -106,7 +106,7 @@ class MarketController extends ScrapeController
             'twitter_id'    => $lookup[0]->id_str,
         ]);
 
-        return $twitter->username;
+        return $twitter->twitter_id;
     }
 
     private function getTwitterId($string)
