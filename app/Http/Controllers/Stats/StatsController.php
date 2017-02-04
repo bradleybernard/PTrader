@@ -17,6 +17,7 @@ class StatsController extends Controller
         foreach($markets as $market) {
             $twitter = Twitter::where('twitter_id', $market->twitter_id)->first();
             $count = Tweet::where('twitter_id', $market->twitter_id)->whereBetween('api_created_at', [$market->date_start, $market->date_end])->count();
+            dd($market, $twitter, $count);
             echo "Market: {$market->short_name}<br/> Twitter: @{$twitter->username}<br/>From: {$market->date_start}<br/>To: {$market->date_end}<br/>Tweet Count: {$count} tweets<br/><br/>";
         }
     }
