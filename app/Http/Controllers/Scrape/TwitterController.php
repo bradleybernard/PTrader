@@ -27,6 +27,7 @@ class TwitterController extends ScrapeController
                     'text'              => $tweet->text,
                     'api_created_at'    => \Carbon\Carbon::parse($tweet->created_at),
                     'created_at'        => \Carbon\Carbon::now(),
+                    'updated_at'        => \Carbon\Carbon::now(),
                 ]);
             }
 
