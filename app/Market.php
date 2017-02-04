@@ -75,7 +75,7 @@ class Market extends Model
 
         foreach($response->Contracts as $contract) {
             $this->parseRanges($contract);
-            if($contract->Status === 'Open' && $contract->BestBuyNoCost > 0.00 && $contract->BestBuyNoCost < 0.99 && $tweetCount + 20 > $contract->MaxTweets) {
+            if($contract->Status === 'Open' && $contract->BestBuyNoCost > 0.00 && $contract->BestBuyNoCost < 0.99 && $tweetCount > $contract->MaxTweets) {
                 $model = Contract::select(['id', 'market_id', 'contract_id', 'active', 'status'])->where('contract_id', $contract->ID)->first();
                 $model->fill(['best_buy_no_cost' => $contract->BestBuyNoCost, 'type' => 0]);
                 $contracts[] = $model;
