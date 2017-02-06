@@ -72,7 +72,6 @@ class ListenForTweets extends Command
                 ]);
 
                 dispatch(new PerformTrade($tweet));
-                //Log::info("{$tweet['user']['screen_name']} just tweeted {$tweet['text']}");
             } else if($isDelete) {
                 dispatch(new DeleteTweet($tweet['delete']['status']['id_str']));
             }

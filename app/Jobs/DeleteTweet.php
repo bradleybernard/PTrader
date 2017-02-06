@@ -7,7 +7,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use App\Twitter;
+use App\Tweet;
 
 class DeleteTweet implements ShouldQueue
 {
@@ -22,6 +22,6 @@ class DeleteTweet implements ShouldQueue
 
     public function handle()
     {
-        Twitter::where('tweet_id', $this->tweetId)->delete();
+        Tweet::where('tweet_id', $this->tweetId)->delete();
     }
 }
