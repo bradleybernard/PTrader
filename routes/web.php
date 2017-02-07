@@ -18,3 +18,4 @@ Route::get('dispatch', 'Bet\BetController@test');
 Route::get('twitter', 'Scrape\TwitterController@importTweets');
 Route::get('markets', 'Scrape\MarketController@scrape');
 Route::get('poll', 'Scrape\MarketController@pollContracts');
+Route::get('plot/{contractId}', 'Stats\StatsController@plot');
