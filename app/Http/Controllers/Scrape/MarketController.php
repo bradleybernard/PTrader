@@ -9,11 +9,47 @@ use TwitterAPI;
 use App\Market;
 use App\Contract;
 use App\Twitter;
+use App\ContractHistory;
 
 class MarketController extends ScrapeController
 {
     private $search = 'How many tweets will @';
     private $timezone = 'America/New_York';
+
+    public function pollContracts()
+    {        
+        $markets = Market::where('status', true)->where('active', true)->get();
+        foreach($markets as $market) {
+            try {
+                $response = $this->client->request('GET', 'ticker/' . $market->ticker_symbol);
+            } catch (ClientException $e) {
+                Log::error($e->getMessage()); return;
+            } catch (ServerException $e) {
+                Log::error($e->getMessage()); return;
+            }
+
+            $response = json_decode((string)$response->getBody());
+
+            $history = [];
+            foreach($response->Contracts as $contract) {
+                $history[] = [
+                    'contract_id' => $contract->ID,
+                    'last_trade_price' => $contract->LastTradePrice,
+                    'best_buy_yes_cost' => $contract->BestBuyYesCost,
+                    'best_buy_no_cost' => $contract->BestBuyNoCost,
+                    'best_sell_yes_cost' => $contract->BestSellYesCost,
+                    'best_sell_no_cost' => $contract->BestSellNoCost,
+                    'last_close_price' => $contract->LastClosePrice,
+                ];
+            }
+
+            if(count($history) == 0) {
+                continue;
+            }
+
+            ContractHistory::insert($history);
+        }
+    }
 
     public function scrape()
     {

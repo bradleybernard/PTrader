@@ -22,7 +22,7 @@ class CreateTradesTable extends Migration
             $table->integer('contract_id')->unsigned();
             $table->string('type');
             $table->integer('quantity')->unsigned();
-            $table->decimal('price_per_share', 10, 4)->unsigned();
+            $table->decimal('price_per_share', 10, 2)->unsigned();
             $table->timestamps();
         });
     }

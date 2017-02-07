@@ -14,7 +14,7 @@ class StatsController extends Controller
 {
     public function showStats()
     {
-        $markets = Market::all();
+        $markets = Market::where('status', true)->where('active', true);
         foreach($markets as $market) {
             $twitter = Twitter::where('twitter_id', $market->twitter_id)->first();
             $count = Tweet::where('twitter_id', $market->twitter_id)->whereBetween('api_created_at', [$market->date_start, $market->date_end])->count();

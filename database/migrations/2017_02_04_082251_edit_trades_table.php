@@ -14,7 +14,7 @@ class EditTradesTable extends Migration
     public function up()
     {
         Schema::table('trades', function (Blueprint $table) {
-            $table->decimal('total', 10, 4)->after('price_per_share')->default(0);
+            $table->decimal('total', 10, 2)->after('price_per_share')->default(0);
             $table->bigInteger('order_id')->nullable()->unsigned()->change();
         });
     }
