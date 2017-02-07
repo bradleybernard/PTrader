@@ -29,6 +29,7 @@ class Contract extends Model
         }
 
         $jar = new \GuzzleHttp\Cookie\FileCookieJar(storage_path($session->cookie_file), true);
+        $account->createClient()->refreshMoney($jar);
 
         try {
             $response = $this->client->request('GET', 'Trade/Load' . $this->urlType() .  '?contractId=' . $this->contract_id, ['cookies' => $jar]);
@@ -79,7 +80,7 @@ class Contract extends Model
             'total'             => ($quantity * $price),
         ]);
 
-        $account->createClient()->refreshMoney();
+        $account->refreshMoney($jar);
     }
 
     private function getOrderId(&$response)

@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Market;
 
 class Kernel extends ConsoleKernel
 {
@@ -25,17 +26,15 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call('App\Http\Controllers\Scrape\MarketController@scrape')
-            ->hourly()
-            ->timezone('America/New_York')
-            ->between('8:00', '15:00');
+        $closingSoon = Market::where('active', true)->where('status', true)->where('date_end', '>=', \Carbon\Carbon::now())->count();
+        if($closingSoon > 0) {
+            $schedule->call('App\Http\Controllers\Scrape\MarketController@scrape')
+                ->everyMinute();
+        }
             
         $schedule->call('App\Http\Controllers\Bet\LoginController@createNewAccountSessions')
             ->twiceDaily(8, 20)
             ->timezone('America/New_York');
-
-        $schedule->call('App\Http\Controllers\Scrape\TwitterController@importTweets')
-            ->daily();
     }
 
     /**
