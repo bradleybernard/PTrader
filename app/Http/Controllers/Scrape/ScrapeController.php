@@ -32,7 +32,7 @@ class ScrapeController extends Controller
         ];
     }
 
-    private function clean($ele)
+    protected function clean($ele)
     {
         return ($ele ? $ele : 0);
     }
