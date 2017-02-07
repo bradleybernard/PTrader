@@ -8,6 +8,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Tweet;
+use Log;
 
 class DeleteTweet implements ShouldQueue
 {
@@ -22,6 +23,11 @@ class DeleteTweet implements ShouldQueue
 
     public function handle()
     {
-        Tweet::where('tweet_id', $this->tweetId)->delete();
+        if(!$tweet = Tweet::where('tweet_id', $this->tweetId)->first()) {
+            Log::error("Tweet delete but didn't exist in first place: " . $this->tweetId);
+            return;
+        }
+
+        $tweet->markDeleted();
     }
 }

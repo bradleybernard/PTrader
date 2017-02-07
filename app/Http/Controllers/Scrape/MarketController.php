@@ -13,7 +13,7 @@ use App\Twitter;
 class MarketController extends ScrapeController
 {
     private $search = 'How many tweets will @';
-    private $timezone = 'EST';
+    private $timezone = 'America/New_York';
 
     public function scrape()
     {
