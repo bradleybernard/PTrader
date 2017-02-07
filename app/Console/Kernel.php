@@ -26,7 +26,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $closingSoon = Market::where('active', true)->where('status', true)->where('date_end', '>=', \Carbon\Carbon::now())->count();
+        $closingSoon = Market::where('active', true)->where('status', true)->where('date_end', '<=', \Carbon\Carbon::now())->count();
         if($closingSoon > 0) {
             $schedule->call('App\Http\Controllers\Scrape\MarketController@scrape')
                 ->everyMinute();
