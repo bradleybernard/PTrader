@@ -31,4 +31,9 @@ class ScrapeController extends Controller
             'Dnt'               => 1,
         ];
     }
+
+    private function clean($ele)
+    {
+        return ($ele ? $ele : 0);
+    }
 }

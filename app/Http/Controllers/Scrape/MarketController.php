@@ -34,12 +34,12 @@ class MarketController extends ScrapeController
             foreach($response->Contracts as $contract) {
                 $history[] = [
                     'contract_id' => $contract->ID,
-                    'last_trade_price' => $contract->LastTradePrice,
-                    'best_buy_yes_cost' => $contract->BestBuyYesCost,
-                    'best_buy_no_cost' => $contract->BestBuyNoCost,
-                    'best_sell_yes_cost' => $contract->BestSellYesCost,
-                    'best_sell_no_cost' => $contract->BestSellNoCost,
-                    'last_close_price' => $contract->LastClosePrice,
+                    'last_trade_price' => $this->clean($contract->LastTradePrice),
+                    'best_buy_yes_cost' => $this->clean($contract->BestBuyYesCost),
+                    'best_buy_no_cost' => $this->clean($contract->BestBuyNoCost),
+                    'best_sell_yes_cost' => $this->clean($contract->BestSellYesCost),
+                    'best_sell_no_cost' => $this->clean($contract->BestSellNoCost),
+                    'last_close_price' => $this->clean($contract->LastClosePrice),
                 ];
             }
 
