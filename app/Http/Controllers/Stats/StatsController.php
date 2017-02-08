@@ -70,7 +70,6 @@ class StatsController extends Controller
             'columns' => $columns,
             'tweets' => $tweets,
             'deleted' => $deleted,
-            'sum' => $sum,
             'all' => $all,
         ]);
     }
@@ -108,7 +107,6 @@ class StatsController extends Controller
             'columns' => $columns,
             'tweets' => $tweets,
             'deleted' => $deleted,
-            'sum' => $sum,
             'all' => $all,
             'market' => $market,
         ]);
