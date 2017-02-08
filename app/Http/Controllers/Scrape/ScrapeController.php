@@ -46,10 +46,6 @@ class ScrapeController extends Controller
             return -0.05;
         }
 
-        if($buyNo === null) {
-            return null;
-        }
-
-        return $ele;
+        return 0;
     }
 }

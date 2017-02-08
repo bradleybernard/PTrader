@@ -69,7 +69,10 @@ class StatsController extends Controller
             'market' => $market,
             'contracts' => $contracts,
             'columns' => $columns,
-            'tweets' => $all,
+            'tweets' => $tweets,
+            'deleted' => $deleted,
+            'sum' => $sum,
+            'all' => $all,
         ]);
     }
 

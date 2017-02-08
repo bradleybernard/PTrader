@@ -37,23 +37,7 @@
                 color: '#7f7f7f'
             }
         },
-        annotations: [
-            @foreach($all as $tweet) 
-                {
-                    text: {{ $tweet->value }},
-                    x: '{{ $tweet->api_created_at }}',
-                    y: 1.03,
-                    xref: 'x',
-                    yref: 'paper',
-                    showarrow: false,
-                    xanchor: 'center',
-                    yanchor: 'center',
-                },
-            @endforeach
-        ],
-    };
-
-    layout.shapes = [
+        shapes: [
 
             @foreach($tweets as $tweet)
             {
@@ -86,7 +70,23 @@
                 }
             },
             @endforeach            
-        ];
+        ],
+        annotations: [
+            @foreach($all as $tweet) 
+            {
+                text: {{ $tweet->value }},
+                x: '{{ $tweet->api_created_at }}',
+                y: 1.03,
+                xref: 'x',
+                yref: 'paper',
+                showarrow: false,
+                xanchor: 'center',
+                yanchor: 'center',
+            },
+            @endforeach
+        ],
+
+    };
 
     Plotly.newPlot('chart', data, layout);
   </script>
