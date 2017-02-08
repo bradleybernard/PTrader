@@ -42,6 +42,21 @@ class StatsController extends Controller
         $columns = ['best_buy_yes_cost', 'best_buy_no_cost'];
         $select = array_merge($columns, ['created_at']);
 
+        $tweets = Tweet::select(['api_created_at', 'tweet_id'])->where('twitter_id', $market->twitter_id)->whereBetween('api_created_at', [$market->date_start, $market->date_end])->get();
+        $deleted = DeletedTweet::select(['api_created_at', 'tweet_id'])->where('twitter_id', $market->twitter_id)->whereBetween('api_created_at', [$market->date_start, $market->date_end])->get();
+
+        $all = $tweets->union($deleted);
+        $all = $all->sortBy('api_created_at');
+        $all = collect($all->values());
+
+        $sum = 0;
+
+        $all->transform(function ($item, $key) use(&$sum) {
+            $sum += ($item->getTable() == 'tweets' ? 1 : -1);
+            $item->value = $sum;
+            return $item;
+        });
+
         $history = [];
         foreach($contracts as $contract) {
             foreach($columns as $column) {
@@ -49,13 +64,12 @@ class StatsController extends Controller
             }
         }
 
-        // dd($contracts);
-
         return view('market')->with([
             'history' => $history,
             'market' => $market,
             'contracts' => $contracts,
             'columns' => $columns,
+            'tweets' => $all,
         ]);
     }
 
