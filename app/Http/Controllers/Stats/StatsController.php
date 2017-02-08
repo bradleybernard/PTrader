@@ -82,10 +82,35 @@ class StatsController extends Controller
         $columns = ['last_trade_price', 'best_buy_yes_cost', 'best_buy_no_cost', 'best_sell_yes_cost', 'best_sell_no_cost', 'last_close_price'];
         $history = DB::table('contract_history')->where('contract_id', $contractId)->get();
 
+
+        if(!$market = Market::where('market_id', $contract->market_id)->first()) {
+            return 'Market not found!';
+        }
+
+
+
+        $tweets = Tweet::select(['api_created_at', 'tweet_id'])->where('twitter_id', $market->twitter_id)->whereBetween('api_created_at', [$history[0]->created_at, $market->date_end])->get();
+        $deleted = DeletedTweet::select(['api_created_at', 'tweet_id'])->where('twitter_id', $market->twitter_id)->whereBetween('api_created_at', [$history[0]->created_at, $market->date_end])->get();
+
+        $all = $tweets->union($deleted);
+        $all = $all->sortBy('api_created_at');
+        $all = collect($all->values());
+
+        $sum = 0;
+
+        $all->transform(function ($item, $key) use(&$sum) {
+            $sum += ($item->getTable() == 'tweets' ? 1 : -1);
+            $item->value = $sum;
+            return $item;
+        });
+
         return view('contract')->with([
             'history' => $history,
             'contract' => $contract,
             'columns' => $columns,
+            'tweets' => $tweets,
+            'deleted' => $deleted,
+            'sum' => $sum,
         ]);
     }
 }

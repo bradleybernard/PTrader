@@ -21,6 +21,7 @@
     var layout = {
         showlegend: true,
         title: '{{ $contract->long_name }}',
+        legend: '{{ $sum }}',
         xaxis: {
             title: 'Time',
             titlefont: {
@@ -36,8 +37,48 @@
                 size: 18,
                 color: '#7f7f7f'
             }
-        }
+        },
+        annotations: [{
+          showarrow: false,
+          text: 'Total: {{ $sum }}',
+          x: 1, y: 1, xref: 'paper', yref: 'paper'
+        }]
     };
+
+    layout.shapes = [
+
+            @foreach($tweets as $tweet)
+            {
+                x0: '{{ $tweet->api_created_at }}',
+                x1: '{{ $tweet->api_created_at }}',
+                type: 'line',
+                y0: 0,
+                y1: 1,
+                xref: 'x',
+                yref: 'paper'  ,
+                line: {
+                    color: 'rgb(30,255,30)',
+                    width: 1
+                }
+            },
+            @endforeach   
+
+            @foreach($deleted as $tweet)
+            {
+                x0: '{{ $tweet->api_created_at }}',
+                x1: '{{ $tweet->api_created_at }}',
+                type: 'line',
+                y0: 0,
+                y1: 1,
+                xref: 'x',
+                yref: 'paper'  ,
+                line: {
+                    color: 'rgb(255,30,30)',
+                    width: 1
+                }
+            },
+            @endforeach            
+        ];
 
     Plotly.newPlot('chart', data, layout);
   </script>
