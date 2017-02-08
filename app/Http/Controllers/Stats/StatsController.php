@@ -111,6 +111,7 @@ class StatsController extends Controller
             'tweets' => $tweets,
             'deleted' => $deleted,
             'sum' => $sum,
+            'all' => $all,
         ]);
     }
 }

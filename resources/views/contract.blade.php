@@ -38,11 +38,19 @@
                 color: '#7f7f7f'
             }
         },
-        annotations: [{
-          showarrow: false,
-          text: 'Total: {{ $sum }}',
-          x: 1, y: 1, xref: 'paper', yref: 'paper'
-        }]
+        annotations: [
+
+        @foreach($all as $tweet) {
+            text: "{{ $tweet->value }}",
+            x: '{{ $tweet->api_created_at }}',
+            y: 1.03,
+            xref: 'x',
+            yref: 'paper',
+            showarrow: false,
+            xanchor: 'left'
+        },
+        @endforeach
+        ]
     };
 
     layout.shapes = [
