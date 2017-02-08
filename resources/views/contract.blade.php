@@ -69,7 +69,33 @@
                     width: 1
                 }
             },
-            @endforeach            
+            @endforeach  
+            {
+                x0: '{{ $market->date_start }}',
+                x1: '{{ $market->date_start }}',
+                type: 'line',
+                y0: 0,
+                y1: 1,
+                xref: 'x',
+                yref: 'paper',
+                line: {
+                    color: 'rgb(30,255,30)',
+                    width: 3
+                }
+            },
+            {
+                x0: '{{ $market->date_end }}',
+                x1: '{{ $market->date_end }}',
+                type: 'line',
+                y0: 0,
+                y1: 1,
+                xref: 'x',
+                yref: 'paper',
+                line: {
+                    color: 'rgb(255,30,30)',
+                    width: 3
+                }
+            },
         ],
         annotations: [
             @foreach($all as $tweet) 
@@ -84,6 +110,26 @@
                 yanchor: 'center',
             },
             @endforeach
+            {
+                text: 'START',
+                x: '{{ $market->date_start }}',
+                y: 1.03,
+                xref: 'x',
+                yref: 'paper',
+                showarrow: false,
+                xanchor: 'center',
+                yanchor: 'center',
+            },
+            {
+                text: 'END',
+                x: '{{ $market->date_end }}',
+                y: 1.03,
+                xref: 'x',
+                yref: 'paper',
+                showarrow: false,
+                xanchor: 'center',
+                yanchor: 'center',
+            }
         ],
     };
 

@@ -110,6 +110,7 @@ class StatsController extends Controller
             'deleted' => $deleted,
             'sum' => $sum,
             'all' => $all,
+            'market' => $market,
         ]);
     }
 }
