@@ -32,8 +32,24 @@ class ScrapeController extends Controller
         ];
     }
 
-    protected function clean($ele)
+    protected function clean($ele, $buyNo = null)
     {
-        return ($ele ? $ele : 0);
+        if($ele) {
+            return $ele;
+        }
+
+        if($buyNo === true) {
+            return 1.05;
+        }
+
+        if($buyNo === false) {
+            return -0.05;
+        }
+
+        if($buyNo === null) {
+            return null;
+        }
+
+        return $ele;
     }
 }

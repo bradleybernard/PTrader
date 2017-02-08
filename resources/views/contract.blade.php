@@ -21,7 +21,6 @@
     var layout = {
         showlegend: true,
         title: '{{ $contract->long_name }}',
-        legend: '{{ $sum }}',
         xaxis: {
             title: 'Time',
             titlefont: {
@@ -39,18 +38,19 @@
             }
         },
         annotations: [
-
-        @foreach($all as $tweet) {
-            text: "{{ $tweet->value }}",
-            x: '{{ $tweet->api_created_at }}',
-            y: 1.03,
-            xref: 'x',
-            yref: 'paper',
-            showarrow: false,
-            xanchor: 'left'
-        },
-        @endforeach
-        ]
+            @foreach($all as $tweet) 
+                {
+                    text: {{ $tweet->value }},
+                    x: '{{ $tweet->api_created_at }}',
+                    y: 1.03,
+                    xref: 'x',
+                    yref: 'paper',
+                    showarrow: false,
+                    xanchor: 'center',
+                    yanchor: 'center',
+                },
+            @endforeach
+        ],
     };
 
     layout.shapes = [
@@ -79,7 +79,7 @@
                 y0: 0,
                 y1: 1,
                 xref: 'x',
-                yref: 'paper'  ,
+                yref: 'paper',
                 line: {
                     color: 'rgb(255,30,30)',
                     width: 1

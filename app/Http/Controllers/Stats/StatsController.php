@@ -87,10 +87,8 @@ class StatsController extends Controller
             return 'Market not found!';
         }
 
-
-
-        $tweets = Tweet::select(['api_created_at', 'tweet_id'])->where('twitter_id', $market->twitter_id)->whereBetween('api_created_at', [$history[0]->created_at, $market->date_end])->get();
-        $deleted = DeletedTweet::select(['api_created_at', 'tweet_id'])->where('twitter_id', $market->twitter_id)->whereBetween('api_created_at', [$history[0]->created_at, $market->date_end])->get();
+        $tweets = Tweet::select(['api_created_at', 'tweet_id'])->where('twitter_id', $market->twitter_id)->whereBetween('api_created_at', [$market->date_start, $market->date_end])->get();
+        $deleted = DeletedTweet::select(['api_created_at', 'tweet_id'])->where('twitter_id', $market->twitter_id)->whereBetween('api_created_at', [$market->date_start, $market->date_end])->get();
 
         $all = $tweets->union($deleted);
         $all = $all->sortBy('api_created_at');

@@ -36,8 +36,8 @@ class MarketController extends ScrapeController
                     'contract_id' => $contract->ID,
                     'last_trade_price' => $this->clean($contract->LastTradePrice),
                     'best_buy_yes_cost' => $this->clean($contract->BestBuyYesCost),
-                    'best_buy_no_cost' => $this->clean($contract->BestBuyNoCost),
-                    'best_sell_yes_cost' => $this->clean($contract->BestSellYesCost),
+                    'best_buy_no_cost' => $this->clean($contract->BestBuyNoCost, true),
+                    'best_sell_yes_cost' => $this->clean($contract->BestSellYesCost, false),
                     'best_sell_no_cost' => $this->clean($contract->BestSellNoCost),
                     'last_close_price' => $this->clean($contract->LastClosePrice),
                 ];
