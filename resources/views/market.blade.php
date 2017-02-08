@@ -74,7 +74,7 @@
         annotations: [
             @foreach($all as $tweet) 
             {
-                text: {{ $tweet->value }},
+                text: '{{ $tweet->value }}',
                 x: '{{ $tweet->api_created_at }}',
                 y: 1.03,
                 xref: 'x',
