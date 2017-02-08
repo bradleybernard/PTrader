@@ -13,7 +13,7 @@
             x: [@foreach($history as $point) '{{ $point->created_at }}', @endforeach],
             y: [@foreach($history as $point) {{ $point->{$column} }}, @endforeach],
             type: 'scatter',
-            name: '{{ studly_case($column) }}',
+            name: '({{ $contract->short_name }}) {{ studly_case($column) }}',
         },
         @endforeach
     ];
