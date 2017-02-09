@@ -13,9 +13,9 @@
 
 Route::get('/', 'Stats\StatsController@showStats');
 Route::get('/stats', 'Stats\StatsController@showStats');
-Route::get('bet/{twitterId}', 'Bet\BetController@placeBet');
+// Route::get('bet/{twitterId}', 'Bet\BetController@placeBet');
 Route::get('login', 'Bet\LoginController@createNewAccountSessions');
-Route::get('dispatch', 'Bet\BetController@test');
+// Route::get('dispatch', 'Bet\BetController@test');
 Route::get('twitter', 'Scrape\TwitterController@importTweets');
 Route::get('markets', 'Scrape\MarketController@scrape');
 Route::get('poll', 'Scrape\MarketController@pollContracts');
