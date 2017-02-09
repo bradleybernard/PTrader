@@ -39,11 +39,11 @@ class ScrapeController extends Controller
         }
 
         if($buyNo === true) {
-            return 1.05;
+            return 1;
         }
 
         if($buyNo === false) {
-            return -0.05;
+            return 0;
         }
 
         return 0;
