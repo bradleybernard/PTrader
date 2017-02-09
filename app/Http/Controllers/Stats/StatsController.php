@@ -24,7 +24,7 @@ class StatsController extends Controller
             $deleted = DeletedTweet::where('twitter_id', $market->twitter_id)->whereBetween('api_created_at', [$market->date_start, $market->date_end])->count();
             $remaining = \Carbon\Carbon::now()->diffForHumans(\Carbon\Carbon::parse($market->date_end));
             $minutes = \Carbon\Carbon::now()->diffInMinutes(\Carbon\Carbon::parse($market->date_end));
-            echo "Market: <a href='{$market->url}' target='_blank'>{$market->short_name}</a> (<a href='/market/{$market->market_id}'>Stats</a>)<br/> Twitter: <a href='https://twitter.com/{$twitter->username}'>@{$twitter->username}</a><br/>From: {$market->date_start}<br/>To: {$market->date_end}<br/>Current Time: {$remaining} ({$minutes} mins)<br/>Tweet Count: {$count} tweets<br/>Deleted Tweet Count: {$deleted} <br/>";
+            echo "Market: <a href='{$market->url}' target='_blank'>{$market->short_name}</a> (<a href='/market/{$market->market_id}'>Stats</a> <a href='/sum/{$market->market_id}'>Sum</a>)<br/> Twitter: <a href='https://twitter.com/{$twitter->username}'>@{$twitter->username}</a><br/>From: {$market->date_start}<br/>To: {$market->date_end}<br/>Current Time: {$remaining} ({$minutes} mins)<br/>Tweet Count: {$count} tweets<br/>Deleted Tweet Count: {$deleted} <br/>";
             foreach($contracts as $contract) {
                 echo "Contract: <a href='{$contract->url}' target='_blank'>{$contract->short_name}</a> (<a href='/contract/{$contract->contract_id}'>Stats</a>)<br/>";
             }
