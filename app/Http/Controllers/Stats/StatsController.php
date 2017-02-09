@@ -109,7 +109,7 @@ class StatsController extends Controller
         $current = 0;
         foreach($history as $event) {
             $total += $event->best_buy_no_cost;
-            if ($current++ == $group) {
+            if (++$current == $group) {
                 $sum[] = ['sum' => $total, 'date' => $event->created_at];
                 $total = $current = 0;
             }
