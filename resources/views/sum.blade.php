@@ -96,8 +96,8 @@
                 x0: 0,
                 x1: 1,
                 type: 'line',
-                y0: {{ $contracts->count() }},
-                y1: {{ $contracts->count() }},
+                y0: {{ $contracts->count() - 1}},
+                y1: {{ $contracts->count() - 1}},
                 xref: 'paper',
                 yref: 'y',
                 line: {
