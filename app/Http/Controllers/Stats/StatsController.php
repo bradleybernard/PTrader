@@ -74,6 +74,58 @@ class StatsController extends Controller
         ]);
     }
 
+    public function sum(Request $request, $marketId)
+    {
+        if(!$market = Market::where('market_id', $marketId)->first()) {
+            return 'Market not found!';
+        }
+
+        $contracts = $market->contracts;
+        $columns = ['best_buy_yes_cost', 'best_buy_no_cost'];
+        $select = array_merge($columns, ['created_at']);
+
+        $tweets = Tweet::select(['api_created_at', 'tweet_id'])->where('twitter_id', $market->twitter_id)->whereBetween('api_created_at', [$market->date_start, $market->date_end])->get()->keyBy('tweet_id');
+        $deleted = DeletedTweet::select(['api_created_at', 'tweet_id'])->where('twitter_id', $market->twitter_id)->whereBetween('api_created_at', [$market->date_start, $market->date_end])->get()->keyBy('tweet_id');
+
+        $all = $tweets->union($deleted);
+        $all = $all->sortBy('api_created_at');
+        $all = collect($all->values());
+
+        $sum = 0;
+        $all->transform(function ($item, $key) use(&$sum) {
+            $sum += ($item->getTable() == 'tweets' ? 1 : -1);
+            $item->value = $sum;
+            return $item;
+        });
+
+        $history = DB::table('contract_history')->select($select)->whereIn('contract_id', $contracts->pluck('contract_id'))->get();
+        // foreach($contracts as $contract) {
+        //     $history[] = DB::table('contract_history')->select($select)->where('contract_id', $contract->contract_id)->get();
+        // }
+
+        $sum = [];
+        $group = $contracts->count();
+        $total = 0;
+        $current = 0;
+        foreach($history as $event) {
+            $total += $event->best_buy_no_cost;
+            if ($current++ == $group) {
+                $sum[] = ['sum' => $total, 'date' => $event->created_at];
+                $total = $current = 0;
+            }
+        }
+
+        return view('sum')->with([
+            'sum' => $sum,
+            'market' => $market,
+            'contracts' => $contracts,
+            'columns' => $columns,
+            'tweets' => $tweets,
+            'deleted' => $deleted,
+            'all' => $all,
+        ]);
+    }
+
     public function contract(Request $request, $contractId)
     {
         if(!$contract = Contract::where('contract_id', $contractId)->first()) {
