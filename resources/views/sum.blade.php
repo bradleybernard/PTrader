@@ -91,7 +91,20 @@
                     color: 'rgb(255,30,30)',
                     width: 3
                 }
-            },          
+            },  
+            {
+                x0: 0,
+                x1: 1,
+                type: 'line',
+                y0: {{ $contracts->count() }},
+                y1: {{ $contracts->count() }},
+                xref: 'paper',
+                yref: 'y',
+                line: {
+                    color: 'rgb(30,30,30)',
+                    width: 3
+                }
+            },         
         ],
         annotations: [
             @foreach($all as $tweet) 
@@ -125,7 +138,7 @@
                 showarrow: false,
                 xanchor: 'center',
                 yanchor: 'center',
-            }
+            },
         ],
     };
 
