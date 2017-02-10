@@ -93,6 +93,8 @@ class Account extends Model
 
     public function refreshMoney($jar = NULL)
     {
+        $this->createClient();
+        
         if(!$jar) {
             $session = $this->session;
             $jar = new \GuzzleHttp\Cookie\FileCookieJar(storage_path($session->cookie_file), true);

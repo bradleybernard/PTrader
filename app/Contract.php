@@ -29,7 +29,7 @@ class Contract extends Model
         }
 
         $jar = new \GuzzleHttp\Cookie\FileCookieJar(storage_path($session->cookie_file), true);
-        $account->createClient()->refreshMoney($jar);
+        // $account->createClient()->refreshMoney($jar);
 
         try {
             $response = $this->client->request('GET', 'Trade/Load' . $this->urlType() .  '?contractId=' . $this->contract_id, ['cookies' => $jar]);
@@ -43,8 +43,8 @@ class Contract extends Model
         $token = $html->find('input[name="__RequestVerificationToken"]', 0)->value;
 
         $price = ($this->type == 0 ? $this->best_buy_no_cost : $this->best_buy_yes_cost);
-        // $quantity = 1;
-        $quantity = (int) floor($account->available / $price);
+        $quantity = 1;
+        // $quantity = (int) floor($account->available / $price);
 
         try {
             $response = $this->client->request('POST', 'Trade/SubmitTrade', [
@@ -65,7 +65,14 @@ class Contract extends Model
         }
 
         if($response->getStatusCode() != 200) {
-            Log::error((string)$response->getBody()); return;
+            return Log::error("Bad HTTP code: " . $response->getStatusCode() . "\n\n" . (string)$response->getBody()); 
+        }
+
+        $content = (string)$response->getBody();
+        if(strpos($content, 'There was a problem creating your offer') !== false) {
+            return Log::error('Might have yes or no contracts preventing you from purchasing the opposite contract. ContractId: ' . $this->contract_id . ' Type: ' . $this->type); 
+        } else if(strpos($content, 'You do not have sufficient funds to make this offer')) {
+            return Log::error('Insufficient funds in the account. Balance: ' . $account->available . ' Checkout price: ' . $price);
         }
 
         Trade::create([
