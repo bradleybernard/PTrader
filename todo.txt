@@ -7,4 +7,5 @@
 - On new market, buy all cheap yes contracts
 - Text message on buy and sell trades? (Twilio, phone per account) (only for end game starts, no good for high freq)
 - Once past a range by tweet count, continuously check for no contracts to buy if any at all pop up
-
+- Add current time and current total tweet count to graph
+- Auto update graph? (ajax)
