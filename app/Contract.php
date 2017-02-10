@@ -43,8 +43,8 @@ class Contract extends Model
         $token = $html->find('input[name="__RequestVerificationToken"]', 0)->value;
 
         $price = ($this->type == 0 ? $this->best_buy_no_cost : $this->best_buy_yes_cost);
-        $quantity = 1;
-        // $quantity = (int) floor($account->available / $price);
+        // $quantity = 1;
+        $quantity = (int) floor($account->available / $price);
 
         try {
             $response = $this->client->request('POST', 'Trade/SubmitTrade', [
