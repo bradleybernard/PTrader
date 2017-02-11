@@ -10,6 +10,7 @@ use App\Twitter;
 use App\Tweet;
 use App\DeletedTweet;
 use App\Contract;
+use App\ContractHistory;
 use DB;
 
 class StatsController extends Controller
@@ -17,18 +18,20 @@ class StatsController extends Controller
     public function showStats()
     {
         $markets = Market::where('status', true)->where('active', true)->get();
-        foreach($markets as $market) {
-            $twitter = Twitter::where('twitter_id', $market->twitter_id)->first();
-            $contracts = Contract::where('market_id', $market->market_id)->get();
-            $deleted = DeletedTweet::where('twitter_id', $market->twitter_id)->whereBetween('created_at', [$market->date_start, $market->date_end])->count();
-            $remaining = \Carbon\Carbon::now()->diffForHumans(\Carbon\Carbon::parse($market->date_end));
-            $minutes = \Carbon\Carbon::now()->diffInMinutes(\Carbon\Carbon::parse($market->date_end));
-            echo "Market: <a href='{$market->url}' target='_blank'>{$market->short_name}</a> (<a href='/market/{$market->market_id}'>Stats</a> <a href='/sum/{$market->market_id}'>Sum</a>)<br/> Twitter: <a href='https://twitter.com/{$twitter->username}'>@{$twitter->username}</a><br/>From: {$market->date_start}<br/>To: {$market->date_end}<br/>Current Time: {$remaining} ({$minutes} mins)<br/>Tweet Count: " . ($market->tweets_current - $market->tweets_start) . " tweets<br/>Deleted Tweet Count: {$deleted} <br/>";
-            foreach($contracts as $contract) {
-                echo "Contract: <a href='{$contract->url}' target='_blank'>{$contract->short_name}</a> (<a href='/contract/{$contract->contract_id}'>Stats</a>)<br/>";
+        foreach($markets as &$market) {
+            $market->twitter = Twitter::where('twitter_id', $market->twitter_id)->first();
+            $market->contracts = Contract::where('market_id', $market->market_id)->get()->keyBy('contract_id');
+            $market->deleted = DeletedTweet::where('twitter_id', $market->twitter_id)->whereBetween('created_at', [$market->date_start, $market->date_end])->count();
+            $market->remaining = \Carbon\Carbon::now()->diffForHumans(\Carbon\Carbon::parse($market->date_end));
+            $market->minutes = \Carbon\Carbon::now()->diffInMinutes(\Carbon\Carbon::parse($market->date_end));
+            $cs = $market->contracts->pluck('contract_id');
+            $history = ContractHistory::whereIn('contract_id', $cs)->orderBy('id', 'DESC')->take(count($cs))->get()->keyBy('contract_id');
+            foreach($history as $cid => $hist) {
+                $market->contracts[$cid]->history = $hist;
             }
-            echo "<br/><br/>";
         }
+
+        return view('markets')->with('markets', $markets);
     }
 
     public function market(Request $request, $marketId)
