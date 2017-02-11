@@ -42,7 +42,7 @@ class StatsController extends Controller
         $select = array_merge($columns, ['created_at']);
 
         $tweets = Tweet::select(['api_created_at', 'tweet_id'])->where('twitter_id', $market->twitter_id)->whereBetween('api_created_at', [$market->date_start, $market->date_end])->get()->keyBy('tweet_id');
-        $deleted = DeletedTweet::select(['created_at as api_created_at', 'tweet_id'])->where('twitter_id', $market->twitter_id)->whereBetween('api_created_at', [$market->date_start, $market->date_end])->get()->keyBy('tweet_id');
+        $deleted = DeletedTweet::select(['created_at as api_created_at', 'tweet_id'])->where('twitter_id', $market->twitter_id)->whereBetween('created_at', [$market->date_start, $market->date_end])->get()->keyBy('tweet_id');
 
         $all = $tweets->union($deleted);
         $all = $all->sortBy('api_created_at');
@@ -84,7 +84,7 @@ class StatsController extends Controller
         $select = array_merge($columns, ['created_at']);
 
         $tweets = Tweet::select(['api_created_at', 'tweet_id'])->where('twitter_id', $market->twitter_id)->whereBetween('api_created_at', [$market->date_start, $market->date_end])->get()->keyBy('tweet_id');
-        $deleted = DeletedTweet::select(['created_at as api_created_at', 'tweet_id'])->where('twitter_id', $market->twitter_id)->whereBetween('api_created_at', [$market->date_start, $market->date_end])->get()->keyBy('tweet_id');
+        $deleted = DeletedTweet::select(['created_at as api_created_at', 'tweet_id'])->where('twitter_id', $market->twitter_id)->whereBetween('created_at', [$market->date_start, $market->date_end])->get()->keyBy('tweet_id');
 
         $all = $tweets->union($deleted);
         $all = $all->sortBy('api_created_at');
@@ -136,7 +136,7 @@ class StatsController extends Controller
         }
 
         $tweets = Tweet::select(['api_created_at', 'tweet_id'])->where('twitter_id', $market->twitter_id)->whereBetween('api_created_at', [$market->date_start, $market->date_end])->get()->keyBy('tweet_id');
-        $deleted = DeletedTweet::select(['created_at as api_created_at', 'tweet_id'])->where('twitter_id', $market->twitter_id)->whereBetween('api_created_at', [$market->date_start, $market->date_end])->get()->keyBy('tweet_id');
+        $deleted = DeletedTweet::select(['created_at as api_created_at', 'tweet_id'])->where('twitter_id', $market->twitter_id)->whereBetween('created_at', [$market->date_start, $market->date_end])->get()->keyBy('tweet_id');
 
         $all = $tweets->union($deleted);
         $all = $all->sortBy('api_created_at');
