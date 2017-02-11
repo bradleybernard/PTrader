@@ -70,7 +70,8 @@ class Market extends Model
 
         $response = json_decode((string)$response->getBody());
 
-        $tweetCount = Tweet::where('twitter_id', $this->twitter_id)->whereBetween('api_created_at', [$this->date_start, $this->date_end])->count();
+        // $tweetCount = Tweet::where('twitter_id', $this->twitter_id)->whereBetween('api_created_at', [$this->date_start, $this->date_end])->count();
+        $tweetCount = $this->tweets_current - $this->tweets_start;
         $contracts = [];
 
         foreach($response->Contracts as $contract) {

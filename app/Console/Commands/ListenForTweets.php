@@ -8,6 +8,7 @@ use App\Jobs\PerformTrade;
 use App\Jobs\DeleteTweet;
 use App\Twitter;
 use App\Tweet;
+use App\Market;
 use Log;
 
 class ListenForTweets extends Command
@@ -71,9 +72,11 @@ class ListenForTweets extends Command
                     'api_created_at'    => \Carbon\Carbon::parse($tweet['created_at']),
                 ]);
 
+                Market::where('twitter_id', $tweet->twitter_id)->increment('tweets_current', 1);
+
                 dispatch(new PerformTrade($tweet));
             } else if($isDelete) {
-                dispatch(new DeleteTweet($tweet['delete']['status']['id_str']));
+                dispatch(new DeleteTweet($tweet['delete']['status']));
             }
 
         })->startListening();

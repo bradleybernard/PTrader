@@ -128,9 +128,28 @@ class MarketController extends ScrapeController
         if(count($markets) > 0) {
             foreach($markets as $market) {
                 $model = Market::firstOrNew(['market_id' => $market['market_id']]);
-                $model->fill($market)->save();
+                $model->fill($market);
+                if(!$model->exists) 
+                    $this->setStartCount($model);
+                $model->save();
             }
         }
+    }
+
+    private function setStartCount(&$market)
+    {
+        try {
+            $response = $this->client->request('GET', $market->url);
+        } catch (ClientException $e) {
+            Log::error($e->getMessage()); return;
+        } catch (ServerException $e) {
+            Log::error($e->getMessage()); return;
+        }
+
+        $response = (string)$response->getBody();
+        $count = $this->getStringBetween($response, ', shall exceed ', ' by the number or range');
+        $market->tweets_start = str_replace(',', '', $count);
+        $market->tweets_current = $market->tweets_start;
     }
 
     private function insertTwitter($username) 
