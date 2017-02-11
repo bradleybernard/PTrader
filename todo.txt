@@ -1,6 +1,6 @@
 - Make deleted tweets sell previously purchased no contracts (only if it is crosses backwards into a range and we bought in that range)
-- More confirmation on buying scrape html to see what happened 
-    - (make sure no yes contracts have been bought before) 
++ More confirmation on buying scrape html to see what happened 
+    + (make sure no yes contracts have been bought before) 
     - (fetch account balance every so often (hourly) and after every trade)
 - Test selling shares
 - Scrape market volume for each contract every hour
