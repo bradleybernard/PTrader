@@ -6,8 +6,10 @@
             </div>
             <div class="panel-body">
                 <dl class="dl-horizontal">
-                    <dt>Market:</dt>
+                    <dt>PredictIt Market:</dt>
                     <dd><a href="{{ $market->url }}" target="_blank">{{ $market->ticker_symbol }}</a></dd>
+                    <dt>Twitter:</dt>
+                    <dd><a href="https://twitter.com/{{ $market->twitter->username }}" target="_blank">{{ '@' . $market->twitter->username }}</a></dd>
                     <dt>Graphs: </dt>
                     <dd>
                         <a href="/market/{{ $market->market_id }}"><span class="glyphicon glyphicon-signal"></span></a> —
