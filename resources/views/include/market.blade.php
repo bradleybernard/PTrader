@@ -23,7 +23,7 @@
                     <dd>{{ $market->remaining }} ({{ $market->minutes }} mins)</dd>
                 </dl>
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
+                    <table class="table table-bordered table-hover table-striped">
                         <thead>
                             <tr>
                                 <th class="text-center">ID</th>
@@ -45,12 +45,11 @@
                                         <a href="{{ $contract->url }}" target="_blank">{{ $contract->contract_id }}</a>
                                     </td>
                                     <td>{{ $contract->short_name }}</td>
-                                    <td>${{ $contract->history->best_buy_yes_cost }}</td>
-                                    <td>${{ $contract->history->best_buy_no_cost }}</td>
-                                    <td>${{ $contract->history->best_sell_yes_cost }}</td>
-                                    <td>${{ $contract->history->best_sell_no_cost }}</td>
-                                    <td>${{ $contract->history->last_close_price }}</td>
-                                    <td>${{ $contract->history->last_trade_price }}</td>
+
+                                    @foreach($columns as $column)
+                                        <td style="{{ isset($market->maxes[$column][$contract->contract_id]) ? 'color: red;' : '' }} {{ isset($market->mins[$column][$contract->contract_id]) ? 'color: green;' : '' }}" >${{ $contract->history->{$column} }}</td>
+                                    @endforeach
+
                                     <td>{{ \Carbon\Carbon::parse($contract->history->created_at)->diffForHumans() }}</td>
                                 </tr>
                             @endforeach

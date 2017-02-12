@@ -11,6 +11,7 @@ use App\Tweet;
 use App\DeletedTweet;
 use App\Contract;
 use App\ContractHistory;
+use View;
 use DB;
 
 class StatsController extends Controller
@@ -18,6 +19,8 @@ class StatsController extends Controller
     public function showStats()
     {
         $markets = Market::where('status', true)->where('active', true)->get();
+        $columns = ['best_buy_yes_cost', 'best_buy_no_cost', 'best_sell_yes_cost', 'best_sell_no_cost', 'last_trade_price', 'last_close_price'];
+
         foreach($markets as &$market) {
             $market->twitter = Twitter::where('twitter_id', $market->twitter_id)->first();
             $market->contracts = Contract::where('market_id', $market->market_id)->get()->keyBy('contract_id');
@@ -29,8 +32,40 @@ class StatsController extends Controller
             foreach($history as $cid => $hist) {
                 $market->contracts[$cid]->history = $hist;
             }
+
+            $maxes = $mins = [];
+            foreach($columns as $column) {  
+                $maxes[$column] = PHP_INT_MIN;
+                $mins[$column] = PHP_INT_MAX;
+            }
+
+            foreach($history as $contract) {
+                foreach($columns as $column) {
+                    $value = $contract->{$column};
+                    $maxes[$column] = max($value, $maxes[$column]);
+                    $mins[$column] = min($value, $mins[$column]);
+                }
+            }
+        
+            $gMaxes = $gMins = [];
+            foreach($history as $contract) {
+                foreach($columns as $column) {
+                    $value = $contract->{$column};
+                    if($maxes[$column] == $value) {
+                        $gMaxes[$column][$contract->contract_id] = true;
+                    }
+                    if($mins[$column] == $value) {
+                        $gMins[$column][$contract->contract_id] = true;
+                    }
+                }
+            }
+
+            $market->maxes = $gMaxes;
+            $market->mins = $gMins;
         }
 
+        View::share('columns', $columns);
+        
         return view('markets')->with('markets', $markets);
     }
 
