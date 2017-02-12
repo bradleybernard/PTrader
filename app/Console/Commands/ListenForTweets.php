@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Spatie\TwitterStreamingApi\PublicStream;
-use App\Jobs\BuyAllNosLessThanTweetCount;
+use App\Jobs\BuyPastNo;
 use App\Jobs\DeleteTweet;
 use App\Twitter;
 use App\Tweet;
@@ -74,7 +74,7 @@ class ListenForTweets extends Command
 
                 Market::where('twitter_id', $tweet->twitter_id)->increment('tweets_current', 1);
 
-                dispatch(new BuyAllNosLessThanTweetCount($tweet));
+                dispatch(new BuyPastNo($tweet));
             } else if($isDelete) {
                 dispatch(new DeleteTweet($tweet['delete']['status']));
             }

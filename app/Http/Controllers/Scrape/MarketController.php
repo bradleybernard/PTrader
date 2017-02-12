@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Scrape\ScrapeController;
 use TwitterAPI;
 
+use App\Jobs\BuyYesEarly;
 use App\Market;
 use App\Contract;
 use App\Twitter;
@@ -129,9 +130,13 @@ class MarketController extends ScrapeController
             foreach($markets as $market) {
                 $model = Market::firstOrNew(['market_id' => $market['market_id']]);
                 $model->fill($market);
-                if(!$model->exists) 
+                if(!$model->exists) {
                     $this->setStartCount($model);
-                $model->save();
+                    $model->save();
+                    dispatch(new BuyYesEarly($model->market_id));
+                } else {
+                    $model->save();
+                }
             }
         }
     }

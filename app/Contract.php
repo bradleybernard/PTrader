@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use App\Trade;
 use App\Session;
+use App\Share;
 use Log;
 
 class Contract extends Model
@@ -26,7 +27,76 @@ class Contract extends Model
         return $this->belongsTo('App\Market', 'market_id', 'market_id');
     }
 
-    public function buyNos($account) 
+    public function buySingleYes($account)
+    {
+        $this->createClient();
+
+        if(!$session = $account->session) {
+            return;
+        }
+
+        $jar = new \GuzzleHttp\Cookie\FileCookieJar(storage_path($session->cookie_file), true);
+
+        try {
+            $response = $this->client->request('GET', 'Trade/Load' . $this->urlType() .  '?contractId=' . $this->contract_id, ['cookies' => $jar]);
+        } catch (ClientException $e) {
+            Log::error($e->getMessage()); return;
+        } catch (ServerException $e) {
+            Log::error($e->getMessage()); return;
+        }
+
+        $html = new \Htmldom((string)$response->getBody());
+        $token = $html->find('input[name="__RequestVerificationToken"]', 0)->value;
+        
+        $quantity = (int)floor($account->available / $this->cost);
+
+        try {
+            $response = $this->client->request('POST', 'Trade/SubmitTrade', [
+                'cookies' => $jar,
+                'form_params' => [ 
+                    '__RequestVerificationToken'        => $token,
+                    'BuySellViewModel.ContractId'       => $this->contract_id,
+                    'BuySellViewModel.TradeType'        => $this->tradeType(),
+                    'BuySellViewModel.Quantity'         => $quantity,
+                    'BuySellViewModel.PricePerShare'    => $this->cost,
+                    'X-Requested-With'                  => 'XMLHttpRequest',
+                ],
+            ]);
+        } catch (ClientException $e) {
+            Log::error($e->getMessage()); return;
+        } catch (ServerException $e) {
+            Log::error($e->getMessage()); return;
+        }
+
+        if($response->getStatusCode() != 200) {
+            return Log::error("Bad HTTP code: " . $response->getStatusCode() . "\n\n" . (string)$response->getBody()); 
+        }
+
+        $content = (string)$response->getBody();
+        if(strpos($content, 'There was a problem creating your offer') !== false) {
+            return Log::error('Might have yes or no contracts preventing you from purchasing the opposite contract. ContractId: ' . $this->contract_id . ' Type: ' . $this->type); 
+        } else if(strpos($content, 'You do not have sufficient funds to make this offer') !== false) {
+            return Log::error('Insufficient funds in the account. Balance: ' . $account->available . ' Checkout price: ' . $price);
+        }
+
+        Trade::create([
+            'account_id'        => $session->account_id,
+            'order_id'          => $this->getOrderId($response),
+            'market_id'         => $this->market_id,
+            'contract_id'       => $this->contract_id,
+            'action'            => $this->action,
+            'type'              => $this->type,
+            'quantity'          => $quantity,
+            'price_per_share'   => $this->cost,
+            'total'             => ($this->cost * $quantity),
+        ]);
+
+        // Insert shares
+
+        $account->refreshMoney($jar);
+    }
+
+    public function buyAllOfSingleNo($account) 
     {
         $this->createClient();
 
@@ -114,6 +184,8 @@ class Contract extends Model
                 'price_per_share'   => $tier->price,
                 'total'             => ($tier->quantity * $tier->price),
             ]);
+
+            // Insert shares
         }
 
         $account->refreshMoney($jar);

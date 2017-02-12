@@ -19,7 +19,45 @@ class Market extends Model
         return $this->hasMany('App\Contract', 'market_id', 'market_id');
     }
 
-    public function findBestContract() 
+    public function findCheapestYesContract()
+    {
+        $this->createClient();
+
+        try {
+            $response = $this->client->request('GET', 'api/marketdata/ticker/' . $this->ticker_symbol);
+        } catch (ClientException $e) {
+            Log::error($e->getMessage()); return;
+        } catch (ServerException $e) {
+            Log::error($e->getMessage()); return;
+        }
+
+        $response = json_decode((string)$response->getBody());
+
+        $contractId = null;
+        $bestBuyYesCost = PHP_INT_MAX;
+
+        foreach($response->Contracts as $contract) {
+            if($contract->Status === 'Open' && $contract->BestBuyYesCost < $bestBuyYesCost && $contract->BestBuyYesCost > 0.00 && $contract->BestBuyYesCost < 0.99) {
+                $contractId = $contract->ID;
+                $bestBuyYesCost = $contract->BestBuyYesCost;
+            }
+        }
+
+        if(!$contractId) {
+            return null;
+        }
+
+        $contract = Contract::select(['id', 'market_id', 'contract_id', 'active', 'status'])->where('contract_id', $contractId)->first();
+        $contract->fill([
+            'cost' => $bestBuyYesCost,
+            'type' => Contract::YES,
+            'action' => Contract::BUY,
+        ]);
+
+        return $contract;
+    }
+
+    public function findMaxYesContract() 
     {
         $this->createClient();
         
@@ -57,7 +95,7 @@ class Market extends Model
         return $contract;
     }
 
-    public function findNoContracts()
+    public function findPastNoContracts()
     {
         $this->createClient();
 
