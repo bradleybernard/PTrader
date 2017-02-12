@@ -18,8 +18,8 @@ class Contract extends Model
     const NO = 0;
     const YES = 1;
 
-    const BUY = 1;
     const SELL = 0;
+    const BUY = 1;
 
     public function market()
     {

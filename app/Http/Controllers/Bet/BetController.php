@@ -30,20 +30,20 @@ class BetController extends ScrapeController
         //      If so then sell that group, log trade and minus stock and update balance
         //      Else no problem
         
-        $trades = Trade::join('markets', 'markets.market_id', '=', 'trades.market_id')
-                    ->select(['trades.*', 'markets.*', 'trades.id as trade_id'])
-                    ->where('markets.twitter_id', $twitterId)
-                    ->where('active', true)
-                    ->where('status', true)
-                    ->where('action', Contract::BUY)
-                    ->where('type', Contract::NO)
-                    ->get()
-                    ->keyBy('trade_id');
+        // $trades = Trade::join('markets', 'markets.market_id', '=', 'trades.market_id')
+        //             ->select(['trades.*', 'markets.*', 'trades.id as trade_id'])
+        //             ->where('markets.twitter_id', $twitterId)
+        //             ->where('active', true)
+        //             ->where('status', true)
+        //             ->where('action', Contract::BUY)
+        //             ->where('type', Contract::NO)
+        //             ->get()
+        //             ->keyBy('trade_id');
 
-        $contracts = Contract::whereIn('contract_id', $trades->pluck('contract_id')->unique())->get();
-        foreach($contracts as &$contract) {
-            $contract->parseRanges();
-        }
+        // $contracts = Contract::whereIn('contract_id', $trades->pluck('contract_id')->unique())->get();
+        // foreach($contracts as &$contract) {
+        //     $contract->parseRanges();
+        // }
     }
 
     public function placeNoBets($twitterId) 

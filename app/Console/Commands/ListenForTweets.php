@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Spatie\TwitterStreamingApi\PublicStream;
-use App\Jobs\PerformTrade;
+use App\Jobs\BuyAllNosLessThanTweetCount;
 use App\Jobs\DeleteTweet;
 use App\Twitter;
 use App\Tweet;
