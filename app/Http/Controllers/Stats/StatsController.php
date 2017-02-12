@@ -42,6 +42,9 @@ class StatsController extends Controller
             foreach($history as $contract) {
                 foreach($columns as $column) {
                     $value = $contract->{$column};
+                    if($value > 0.99 || $value < 0.01) 
+                        continue;
+                    
                     $maxes[$column] = max($value, $maxes[$column]);
                     $mins[$column] = min($value, $mins[$column]);
                 }
@@ -65,7 +68,7 @@ class StatsController extends Controller
         }
 
         View::share('columns', $columns);
-        
+
         return view('markets')->with('markets', $markets);
     }
 
