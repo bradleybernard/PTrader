@@ -19,7 +19,7 @@ class Tweet extends Model
         $count = DeletedTweet::where('tweet_id', $this->tweet_id)->count();
 
         if($count != 0) {
-            return $this->delete();
+            return;
         }
 
         DeletedTweet::create([
@@ -28,7 +28,5 @@ class Tweet extends Model
             'text' => $this->text,
             'api_created_at' => $this->api_created_at,
         ]);
-
-        $this->delete();
     }
 }
