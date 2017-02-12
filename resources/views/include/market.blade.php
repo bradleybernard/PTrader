@@ -51,7 +51,7 @@
                                     ">{{ $contract->short_name }}</td>
 
                                     @foreach($columns as $column)
-                                        <td style="{{ isset($market->maxes[$column][$contract->contract_id]) ? 'background-color: rgba(255, 0, 0, 0.5);' : '' }} {{ isset($market->mins[$column][$contract->contract_id]) ? 'background-color: rgba(0, 255, 0, 0.5);' : '' }}" >${{ $contract->history->{$column} }}</td>
+                                        <td style="{{ isset($market->maxes[$column][$contract->contract_id]) ? 'background-color: rgba(255, 0, 0, 0.5);' : '' }} {{ isset($market->mins[$column][$contract->contract_id]) ? 'background-color: rgba(0, 255, 0, 0.5);' : '' }}" >${{ $contract->history->{$column} == 0 || $contract->history->{$column} == 1.00 ? 'None' : $contract->history->{$column} }}</td>
                                     @endforeach
 
                                     <td>{{ \Carbon\Carbon::parse($contract->history->created_at)->diffForHumans() }}</td>
