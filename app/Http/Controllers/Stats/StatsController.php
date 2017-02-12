@@ -19,7 +19,7 @@ class StatsController extends Controller
     public function showStats()
     {
         $markets = Market::where('status', true)->where('active', true)->get();
-        $columns = ['best_buy_yes_cost', 'best_buy_no_cost', 'best_sell_yes_cost', 'best_sell_no_cost', 'last_trade_price', 'last_close_price'];
+        $columns = ['best_buy_yes_cost', 'best_buy_no_cost', 'last_trade_price', 'last_close_price'];
 
         foreach($markets as &$market) {
             $market->twitter = Twitter::where('twitter_id', $market->twitter_id)->first();
@@ -44,7 +44,7 @@ class StatsController extends Controller
                     $value = $contract->{$column};
                     if($value > 0.99 || $value < 0.01) 
                         continue;
-                    
+
                     $maxes[$column] = max($value, $maxes[$column]);
                     $mins[$column] = min($value, $mins[$column]);
                 }
