@@ -37,7 +37,7 @@ class Market extends Model
         $bestBuyYesCost = PHP_INT_MAX;
 
         foreach($response->Contracts as $contract) {
-            if($contract->Status === 'Open' && $contract->BestBuyYesCost < $bestBuyYesCost && $contract->BestBuyYesCost > 0.00 && $contract->BestBuyYesCost < 0.99) {
+            if($contract->Status === 'Open' && $contract->BestBuyYesCost <= $bestBuyYesCost && $contract->BestBuyYesCost > 0.00 && $contract->BestBuyYesCost < 0.99) {
                 $contractId = $contract->ID;
                 $bestBuyYesCost = $contract->BestBuyYesCost;
             }
