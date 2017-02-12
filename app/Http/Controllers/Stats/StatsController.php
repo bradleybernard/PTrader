@@ -19,7 +19,8 @@ class StatsController extends Controller
     public function showStats()
     {
         $markets = Market::where('status', true)->where('active', true)->get();
-        $columns = ['best_buy_yes_cost', 'best_buy_no_cost', 'last_trade_price', 'last_close_price'];
+        $columns = ['best_buy_yes_cost', 'best_buy_no_cost', 'best_sell_no_cost', 'best_sell_yes_cost', 'last_close_price', 'last_trade_price'];
+        $highlight = ['best_buy_yes_cost', 'best_buy_no_cost', 'last_trade_price', 'last_close_price'];
 
         foreach($markets as &$market) {
             $market->twitter = Twitter::where('twitter_id', $market->twitter_id)->first();
@@ -34,13 +35,13 @@ class StatsController extends Controller
             }
 
             $maxes = $mins = [];
-            foreach($columns as $column) {  
+            foreach($highlight as $column) {  
                 $maxes[$column] = PHP_INT_MIN;
                 $mins[$column] = PHP_INT_MAX;
             }
 
             foreach($history as $contract) {
-                foreach($columns as $column) {
+                foreach($highlight as $column) {
                     $value = $contract->{$column};
                     if($value > 0.99 || $value < 0.01) 
                         continue;
@@ -52,7 +53,7 @@ class StatsController extends Controller
         
             $gMaxes = $gMins = [];
             foreach($history as $contract) {
-                foreach($columns as $column) {
+                foreach($highlight as $column) {
                     $value = $contract->{$column};
                     if($maxes[$column] == $value) {
                         $gMaxes[$column][$contract->contract_id] = true;

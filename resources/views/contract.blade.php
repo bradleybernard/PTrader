@@ -20,9 +20,9 @@
 
         var layout = {
             showlegend: true,
-            title: '{{ $contract->long_name }}',
+            title: '{{ $contract->long_name }} ({{ $market->tweets_current - $market->tweets_start }} tweets)',
             xaxis: {
-                title: 'Time',
+                title: 'Time ({{ \Carbon\Carbon::now() }})',
                 titlefont: {
                     family: 'Courier New, monospace',
                     size: 18,
