@@ -22,3 +22,7 @@ Route::get('poll', 'Scrape\MarketController@pollContracts');
 Route::get('contract/{contractId}', 'Stats\StatsController@contract');
 Route::get('market/{marketId}', 'Stats\StatsController@market');
 Route::get('sum/{marketId}', 'Stats\StatsController@sum');
+
+Route::get('revert', function() {
+    app('App\Http\Controllers\Bet\BetController')->revertNoBets('822215679726100480');
+});

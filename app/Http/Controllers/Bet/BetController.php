@@ -19,10 +19,34 @@ class BetController extends ScrapeController
 
     public function test() 
     {
-        dispatch(new \App\Jobs\PerformTrade(Tweet::find(1)));
+        dispatch(new \App\Jobs\BuyAllNosLessThanTweetCount(Tweet::find(1)));
     }
 
-    public function placeBet($twitterId) 
+    public function revertNoBets($twitterId) 
+    {
+        // 1. View stock (quantity) of current bought no shares from the current market tied to this twitter account
+        // 2. For each bought stock group 
+        //      Check if  current tweet count (current - start) is greater than contract.min and less than contract.max 
+        //      If so then sell that group, log trade and minus stock and update balance
+        //      Else no problem
+        
+        $trades = Trade::join('markets', 'markets.market_id', '=', 'trades.market_id')
+                    ->select(['trades.*', 'markets.*', 'trades.id as trade_id'])
+                    ->where('markets.twitter_id', $twitterId)
+                    ->where('active', true)
+                    ->where('status', true)
+                    ->where('action', Contract::BUY)
+                    ->where('type', Contract::NO)
+                    ->get()
+                    ->keyBy('trade_id');
+
+        $contracts = Contract::whereIn('contract_id', $trades->pluck('contract_id')->unique())->get();
+        foreach($contracts as &$contract) {
+            $contract->parseRanges();
+        }
+    }
+
+    public function placeNoBets($twitterId) 
     {
         if(!$market = $this->findMarket($twitterId)) {
             return;
@@ -35,7 +59,7 @@ class BetController extends ScrapeController
         $account = $this->chooseAccount();
 
         foreach($contracts as $contract) {
-            $contract->bet($account);
+            $contract->buyNos($account);
         }
     }
 

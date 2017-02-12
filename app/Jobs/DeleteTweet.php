@@ -39,5 +39,7 @@ class DeleteTweet implements ShouldQueue
         }
 
         Market::where('twitter_id', $twitterId)->decrement('tweets_current', 1);
+
+        app('App\Http\Controllers\Bet\BetController')->revertNoBets($this->tweet->twitter_id);
     }
 }

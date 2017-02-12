@@ -9,7 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Tweet;
 
-class PerformTrade implements ShouldQueue
+class BuyAllNosLessThanTweetCount implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -22,6 +22,6 @@ class PerformTrade implements ShouldQueue
 
     public function handle()
     {
-        app('App\Http\Controllers\Bet\BetController')->placeBet($this->tweet->twitter_id);
+        app('App\Http\Controllers\Bet\BetController')->placeNoBets($this->tweet->twitter_id);
     }
 }

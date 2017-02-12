@@ -49,8 +49,9 @@ class Market extends Model
 
         $contract = Contract::select(['id', 'market_id', 'contract_id', 'active', 'status'])->where('contract_id', $contractId)->first();
         $contract->fill([
-            'best_buy_yes_cost' => $bestBuyYesCost,
-            'type' => 1,
+            'cost' => $bestBuyYesCost,
+            'type' => Contract::YES,
+            'action' => Contract::BUY,
         ]);
 
         return $contract;
@@ -70,15 +71,14 @@ class Market extends Model
 
         $response = json_decode((string)$response->getBody());
 
-        // $tweetCount = Tweet::where('twitter_id', $this->twitter_id)->whereBetween('api_created_at', [$this->date_start, $this->date_end])->count();
-        $tweetCount = $this->tweets_current - $this->tweets_start;
+        $tweetCount = ($this->tweets_current - $this->tweets_start);
         $contracts = [];
 
         foreach($response->Contracts as $contract) {
             $this->parseRanges($contract);
             if($contract->Status === 'Open' && $contract->BestBuyNoCost > 0.00 && $contract->BestBuyNoCost < 0.99 && $tweetCount > $contract->MaxTweets) {
                 $model = Contract::select(['id', 'market_id', 'contract_id', 'active', 'status'])->where('contract_id', $contract->ID)->first();
-                $model->fill(['best_buy_no_cost' => $contract->BestBuyNoCost, 'type' => 0]);
+                $model->fill(['cost' => $contract->BestBuyNoCost, 'action' => Contract::BUY, 'type' => Contract::NO]);
                 $contracts[] = $model;
             }
         }
@@ -98,7 +98,7 @@ class Market extends Model
 
         // 39-
         if($count == 1 && $short[$len - 1] === '-') {
-            $contract->MinTweets = 0;
+            $contract->MinTweets = PHP_INT_MIN;
             $contract->MaxTweets = (int)$short;
         }
 

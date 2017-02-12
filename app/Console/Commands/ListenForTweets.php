@@ -74,7 +74,7 @@ class ListenForTweets extends Command
 
                 Market::where('twitter_id', $tweet->twitter_id)->increment('tweets_current', 1);
 
-                dispatch(new PerformTrade($tweet));
+                dispatch(new BuyAllNosLessThanTweetCount($tweet));
             } else if($isDelete) {
                 dispatch(new DeleteTweet($tweet['delete']['status']));
             }
