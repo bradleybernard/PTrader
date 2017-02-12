@@ -26,13 +26,20 @@ class StatsController extends Controller
             $market->twitter = Twitter::where('twitter_id', $market->twitter_id)->first();
             $market->contracts = Contract::where('market_id', $market->market_id)->get()->keyBy('contract_id');
             $market->deleted = DeletedTweet::where('twitter_id', $market->twitter_id)->whereBetween('created_at', [$market->date_start, $market->date_end])->count();
+            
             $market->remaining = \Carbon\Carbon::now()->diffForHumans(\Carbon\Carbon::parse($market->date_end));
             $market->minutes = \Carbon\Carbon::now()->diffInMinutes(\Carbon\Carbon::parse($market->date_end));
+            
+            foreach($market->contracts as &$contract) {
+                $contract->parseRanges();
+            }
+
             $cs = $market->contracts->pluck('contract_id');
             $history = ContractHistory::whereIn('contract_id', $cs)->orderBy('id', 'DESC')->take(count($cs))->get()->keyBy('contract_id');
             foreach($history as $cid => $hist) {
                 $market->contracts[$cid]->history = $hist;
             }
+
 
             $maxes = $mins = [];
             foreach($highlight as $column) {  

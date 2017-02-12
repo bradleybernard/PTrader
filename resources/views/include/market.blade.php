@@ -44,7 +44,11 @@
                                         <a href="/contract/{{ $contract->contract_id }}"><span class="glyphicon glyphicon-signal"></span></a> — 
                                         <a href="{{ $contract->url }}" target="_blank">{{ $contract->contract_id }}</a>
                                     </td>
-                                    <td>{{ $contract->short_name }}</td>
+                                    <td style="
+                                    @if(($market->tweets_current - $market->tweets_start) >= $contract->MinTweets && ($market->tweets_current - $market->tweets_start) <= $contract->MaxTweets)
+                                        background-color: gold;
+                                    @endif
+                                    ">{{ $contract->short_name }}</td>
 
                                     @foreach($columns as $column)
                                         <td style="{{ isset($market->maxes[$column][$contract->contract_id]) ? 'background-color: rgba(255, 0, 0, 0.5);' : '' }} {{ isset($market->mins[$column][$contract->contract_id]) ? 'background-color: rgba(0, 255, 0, 0.5);' : '' }}" >${{ $contract->history->{$column} }}</td>
