@@ -37,7 +37,7 @@ class Market extends Model
         $bestBuyYesCost = PHP_INT_MAX;
 
         foreach($response->Contracts as $contract) {
-            if($contract->Status === 'Open' && $contract->BestBuyYesCost <= $bestBuyYesCost && $contract->BestBuyYesCost > 0.00 && $contract->BestBuyYesCost < 0.99) {
+            if($contract->Status === 'Open' && $contract->BestBuyYesCost <= $bestBuyYesCost && $contract->BestBuyYesCost > 0.00 && $contract->BestBuyYesCost < 1.00) {
                 $contractId = $contract->ID;
                 $bestBuyYesCost = $contract->BestBuyYesCost;
             }
@@ -114,7 +114,7 @@ class Market extends Model
 
         foreach($response->Contracts as $contract) {
             $this->parseRanges($contract);
-            if($contract->Status === 'Open' && $contract->BestBuyNoCost > 0.00 && $contract->BestBuyNoCost < 0.99 && $tweetCount > $contract->MaxTweets) {
+            if($contract->Status === 'Open' && $contract->BestBuyNoCost > 0.00 && $contract->BestBuyNoCost < 1.00 && $tweetCount > $contract->MaxTweets) {
                 $model = Contract::select(['id', 'market_id', 'contract_id', 'active', 'status'])->where('contract_id', $contract->ID)->first();
                 $model->fill(['cost' => $contract->BestBuyNoCost, 'action' => Contract::BUY, 'type' => Contract::NO]);
                 $contracts[] = $model;
