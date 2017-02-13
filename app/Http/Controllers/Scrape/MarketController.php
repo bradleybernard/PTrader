@@ -7,6 +7,7 @@ use App\Http\Controllers\Scrape\ScrapeController;
 use TwitterAPI;
 
 use App\Jobs\BuyYesEarly;
+use App\Jobs\BuyPastNoContinuous;
 use App\Market;
 use App\Contract;
 use App\Twitter;
@@ -30,9 +31,20 @@ class MarketController extends ScrapeController
             }
 
             $response = json_decode((string)$response->getBody());
+            
+            $count = ($market->tweets_current - $market->tweets_start);
 
             $history = [];
+            $contracts = [];
             foreach($response->Contracts as $contract) {
+
+                $market->parseRanges($contract);
+                if($contract->Status === 'Open' && $contract->BestBuyNoCost > 0.00 && $contract->BestBuyNoCost < 1.00 && $count > $contract->MaxTweets) {
+                    $model = Contract::select(['id', 'market_id', 'contract_id', 'active', 'status'])->where('contract_id', $contract->ID)->first();
+                    $model->fill(['cost' => $contract->BestBuyNoCost, 'action' => Contract::BUY, 'type' => Contract::NO]);
+                    $contracts[] = $model;
+                }
+
                 $history[] = [
                     'contract_id' => $contract->ID,
                     'last_trade_price' => $this->clean($contract->LastTradePrice),
@@ -42,6 +54,10 @@ class MarketController extends ScrapeController
                     'best_sell_no_cost' => $this->clean($contract->BestSellNoCost),
                     'last_close_price' => $this->clean($contract->LastClosePrice),
                 ];
+            }
+
+            if(count($contracts) > 0) {
+                dispatch(new BuyPastNoContinuous($contracts));
             }
 
             if(count($history) == 0) {
@@ -193,5 +209,4 @@ class MarketController extends ScrapeController
         $len = strpos($string, $end, $ini) - $ini;
         return substr($string, $ini, $len);
     }
-
 }

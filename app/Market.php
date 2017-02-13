@@ -128,7 +128,7 @@ class Market extends Model
         return $contracts;
     }
 
-    private function parseRanges(&$contract) {
+    public function parseRanges(&$contract) {
         $short = $contract->ShortName;
         $len = strlen($short);
         $pieces = explode(' ', $short);

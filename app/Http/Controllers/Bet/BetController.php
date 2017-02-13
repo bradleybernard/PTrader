@@ -89,6 +89,17 @@ class BetController extends ScrapeController
         }
     }
 
+    public function buyPastNoContracts($contracts) 
+    {
+        if(!$account = $this->chooseAccount()) {
+            return;
+        }
+
+        foreach($contracts as $contract) {
+            $contract->buyAllOfSingleNo($account);
+        }
+    }
+
     private function findMarket($twitterId)
     {
         $market = Market::where('twitter_id', $twitterId)
