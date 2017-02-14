@@ -122,6 +122,6 @@ class BetController extends ScrapeController
 
     private function chooseAccount($algorithm = 'free_nos')
     {
-        return Account::where('algorithm', $algorithm)->first();
+        return Account::where('algorithm', $algorithm)->where('available', '>=', '1.00')->first();
     }
 }
