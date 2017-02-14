@@ -123,11 +123,12 @@ class Contract extends Model
         foreach($rows as $key => $row) {
             if($key == 0) continue;
 
+            $parts = $row->find('td a');
+            
             if(!isset($parts[0])) {
                 Log::error($row->outertext);
             }
 
-            $parts = $row->find('td a');
             $tiers[] = (object) [
                 'quantity' => (int)trim($parts[0]->plaintext),
                 'price' => (float) (rtrim(trim($parts[1]->plaintext), '¢')/100),
