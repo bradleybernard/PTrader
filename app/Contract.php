@@ -193,7 +193,7 @@ class Contract extends Model
             Nexmo::message()->send([
                 'to' => $account->phone,
                 'from' => config('nexmo.phone'),
-                'text' => "{$trade->quantity} no shares (${$trade->price_per_share}/share) purchased at ${$trade->total} for market: {$this->market->short_name}. Current account balance for {$account->name}: ${$account->available}."
+                'text' => "{$trade->quantity} no shares ($" . $trade->price_per_share . "/share) purchased at $" . $trade->total . " for market: {$this->market->short_name}. Current account balance for {$account->name}: $" . $account->available,
             ]);
 
             // Insert shares
