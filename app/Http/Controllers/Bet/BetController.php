@@ -55,6 +55,8 @@ class BetController extends ScrapeController
 
     public function buyEarlyYesContract($marketId) 
     {
+        $algo = 'early_yes';
+
         if(!$market = Market::where('market_id', $marketId)) {
             return;
         }
@@ -63,7 +65,7 @@ class BetController extends ScrapeController
             return;
         }
 
-        if(!$account = $this->chooseAccount()) {
+        if(!$account = $this->chooseAccount($algo)) {
             return;
         }
 
@@ -72,6 +74,8 @@ class BetController extends ScrapeController
 
     public function buyPastNo($twitterId) 
     {
+        $algo = 'free_nos';
+
         if(!$market = $this->findMarket($twitterId)) {
             return;
         }
@@ -80,7 +84,7 @@ class BetController extends ScrapeController
             return;
         }
 
-        if(!$account = $this->chooseAccount()) {
+        if(!$account = $this->chooseAccount($algo)) {
             return;
         }
 
@@ -91,7 +95,9 @@ class BetController extends ScrapeController
 
     public function buyPastNoContracts($contracts) 
     {
-        if(!$account = $this->chooseAccount()) {
+        $algo = 'free_nos';
+
+        if(!$account = $this->chooseAccount($algo)) {
             return;
         }
 
@@ -114,8 +120,8 @@ class BetController extends ScrapeController
         return $market;
     }
 
-    private function chooseAccount()
+    private function chooseAccount($algorithm = 'free_nos')
     {
-        return Account::where('id', 1)->first();
+        return Account::where('algorithm', $algorithm)->first();
     }
 }
