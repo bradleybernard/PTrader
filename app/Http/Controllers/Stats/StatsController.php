@@ -109,9 +109,7 @@ class StatsController extends Controller
 
         $history = [];
         foreach($contracts as $contract) {
-            foreach($columns as $column) {
-                $history[$contract->contract_id] = DB::table('contract_history')->select($select)->where('contract_id', $contract->contract_id)->get();
-            }
+            $history[$contract->contract_id] = DB::table('contract_history')->select($select)->where('contract_id', $contract->contract_id)->get();
         }
 
         return view('market')->with([
