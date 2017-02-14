@@ -57,7 +57,7 @@ class BetController extends ScrapeController
     {
         $algo = 'early_yes';
 
-        if(!$market = Market::where('market_id', $marketId)) {
+        if(!$market = Market::where('market_id', $marketId)->first()) {
             return;
         }
 
