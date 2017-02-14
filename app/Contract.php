@@ -8,6 +8,7 @@ use App\Trade;
 use App\Session;
 use App\Share;
 use Log;
+use Nexmo;
 
 class Contract extends Model
 {
@@ -79,7 +80,7 @@ class Contract extends Model
             return Log::error('Insufficient funds in the account. Balance: ' . $account->available . ' Checkout price: ' . $price);
         }
 
-        Trade::create([
+        $trade = Trade::create([
             'account_id'        => $session->account_id,
             'order_id'          => $this->getOrderId($response),
             'market_id'         => $this->market_id,
@@ -177,7 +178,7 @@ class Contract extends Model
 
             $account->available -= $total;
 
-            Trade::create([
+            $trade = Trade::create([
                 'account_id'        => $session->account_id,
                 'order_id'          => $this->getOrderId($response),
                 'market_id'         => $this->market_id,
@@ -187,6 +188,12 @@ class Contract extends Model
                 'quantity'          => $tier->quantity,
                 'price_per_share'   => $tier->price,
                 'total'             => ($tier->quantity * $tier->price),
+            ]);
+
+            Nexmo::message()->send([
+                'to' => $account->phone,
+                'from' => config('nexmo.phone'),
+                'text' => "{$trade->quantity} no shares (${$trade->price_per_share}/share) purchased at ${$trade->total} for market: {$this->market->short_name}. Current account balance for {$account->name}: ${$account->available}."
             ]);
 
             // Insert shares

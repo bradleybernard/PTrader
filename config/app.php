@@ -179,6 +179,8 @@ return [
 
         Yangqi\Htmldom\HtmldomServiceProvider::class,
         Thujohn\Twitter\TwitterServiceProvider::class,
+        Barryvdh\Debugbar\ServiceProvider::class,
+        Nexmo\Laravel\NexmoServiceProvider::class
         // Spatie\LaravelTwitterStreamingApi\TwitterStreamingApiServiceProvider::class,
 
     ],
@@ -232,6 +234,7 @@ return [
 
          'Htmldom' => Yangqi\Htmldom\Htmldom::class,
          'TwitterAPI' => Thujohn\Twitter\Facades\Twitter::class,
+         'Nexmo' => \Nexmo\Laravel\Facade\Nexmo::class
         // 'TwitterStreamingApi' => Spatie\LaravelTwitterStreamingApi\TwitterStreamingApiFacade::class,
 
 
