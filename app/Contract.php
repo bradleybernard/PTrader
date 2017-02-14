@@ -173,7 +173,7 @@ class Contract extends Model
             if(strpos($content, 'There was a problem creating your offer') !== false) {
                 return Log::error('Might have yes or no contracts preventing you from purchasing the opposite contract. ContractId: ' . $this->contract_id . ' Type: ' . $this->type); 
             } else if(strpos($content, 'You do not have sufficient funds to make this offer') !== false) {
-                return Log::error('Insufficient funds in the account. Balance: ' . $account->available . ' Checkout price: ' . $price);
+                return Log::error('Insufficient funds in the account. Balance: ' . $account->available . ' Checkout price: ' . ($tier->quantity * $tier->price));
             }
 
             $account->available -= $total;
