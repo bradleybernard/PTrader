@@ -181,7 +181,7 @@ class StatsController extends Controller
             return 'Contract not found!';
         }
 
-        $columns = ['last_trade_price', 'best_buy_yes_cost', 'best_buy_no_cost', 'best_sell_yes_cost', 'best_sell_no_cost', 'last_close_price'];
+        $columns = ['best_buy_yes_cost', 'best_buy_no_cost'];
         $history = DB::table('contract_history')->where('contract_id', $contractId)->get();
 
         if(!$market = Market::where('market_id', $contract->market_id)->first()) {
