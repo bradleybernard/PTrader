@@ -150,7 +150,7 @@ class StatsController extends Controller
             return $item;
         });
 
-        $history = DB::table('contract_history')->select($select)->whereIn('contract_id', $contracts->pluck('contract_id'))->get();
+        $history = DB::table('contract_history')->select($select)->whereIn('contract_id', $contracts->pluck('contract_id'))->orderBy('created_at', 'ASC')->get();
 
         $sum = [];
         $group = $contracts->count();
