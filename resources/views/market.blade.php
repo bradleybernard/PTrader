@@ -8,12 +8,29 @@
       
       <div id="chart" style="width: 100%; height: 100%;"></div>
       <script>
+        var data_x = [];
+
+        @foreach($contracts as $contract)
+            @foreach($columns as $column)
+                var data_y_{{ $contract->contract_id }}_{{ $column }} = [];
+            @endforeach
+        @endforeach
+
+        @foreach($contracts as $contract)
+            @foreach($history[$contract->contract_id] as $point) 
+                data_x.push('{{ $point->created_at }}');
+                @foreach($columns as $key)
+                        data_y_{{ $contract->contract_id }}_{{ $key }}.push({{ $point->$key }});
+                @endforeach
+            @endforeach
+        @endforeach
+        
         var data = [
             @foreach($columns as $column)
                 @foreach($contracts as $contract)
                 {
-                    x: [@foreach($history[$contract->contract_id] as $point) '{{ $point->created_at }}', @endforeach],
-                    y: [@foreach($history[$contract->contract_id] as $point) {{ $point->{$column} }}, @endforeach],
+                    x: data_x,
+                    y: data_y_{{ $contract->contract_id }}_{{ $column }},
                     type: 'scatter',
                     name: '({{ $contract->short_name }}) {{ studly_case($column) }}',
                 },

@@ -41,10 +41,6 @@
                         </tbody>
                     </table>
                 </div>
-               {{--  <a href="/market/{{ $market->market_id }}"><span class="glyphicon glyphicon-signal"></span></a> —
-                        <a href="/sum/{{ $market->market_id }}"><span class="glyphicon glyphicon-plus"></span></a> --}}
-                        {{-- <i class="fa fa-bar-chart" aria-hidden="true"></i> --}}
-
                 <div class="table-responsive">
                     <table class="table table-bordered table-hover">
                         <thead>

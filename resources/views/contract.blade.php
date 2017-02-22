@@ -7,16 +7,18 @@
     <body>
         <div id="chart" style="width: 100%; height: 100%;"></div>
         <script>
-            @foreach($columns as $column)
+
             var data_x = [];
-            var data_y_{{ $column }} = [];
+
+            @foreach($columns as $column)
+                var data_y_{{ $column }} = [];
             @endforeach
 
             @foreach($history as $point) 
+                data_x.push('{{ $point->created_at }}');
                 @foreach($columns as $key)
                         data_y_{{ $key }}.push({{ $point->$key }});
                 @endforeach
-                data_x.push('{{ $point->created_at }}');
             @endforeach
 
             var data = [
