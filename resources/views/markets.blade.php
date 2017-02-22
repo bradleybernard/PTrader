@@ -8,7 +8,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     </head>
     <body>
-        <div class="container">
+        <div class="container" style="padding-top: 40px;">
             {{-- <div class="row">
                 <div class="col">
                     <h1 class="text-center">All markets</h1>
