@@ -112,7 +112,7 @@ class MarketController extends ScrapeController
                     'market_id' => $market->ID,
                     'contract_id' => $contract->ID,
                     'active' => true,
-                    'short_name' => $contract->ShortName,
+                    'short_name' => $this->fixShortName($contract),
                     'long_name' => $contract->LongName,
                     'ticker_symbol' => $contract->TickerSymbol,
                     'status' => ($contract->Status == 'Open' ? true : false),
@@ -155,6 +155,20 @@ class MarketController extends ScrapeController
                 }
             }
         }
+    }
+
+    private function fixShortName(&$contract)
+    {
+        $len = strlen($contract->ShortName);
+        if(strpos($contract->Name, 'or more') !== false && $contract->ShortName[$len - 1] == '-') {
+            $contract->ShortName[$len - 1] = '+';
+        }
+
+        if(strpos($contract->Name, 'or fewer') !== false && $contract->ShortName[$len - 1] == '+') {
+            $contract->ShortName[$len - 1] = '-';
+        }
+
+        return $contract->ShortName;
     }
 
     private function setStartCount(&$market)

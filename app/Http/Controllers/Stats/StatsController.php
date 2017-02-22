@@ -18,7 +18,7 @@ class StatsController extends Controller
 {
     public function showStats()
     {
-        $markets = Market::where('status', true)->where('active', true)->get();
+        $markets = Market::where('status', true)->get();
         $columns = ['best_buy_yes_cost', 'best_buy_no_cost', 'best_sell_no_cost', 'best_sell_yes_cost', 'last_close_price', 'last_trade_price'];
         $highlight = ['best_buy_yes_cost', 'best_buy_no_cost', 'last_trade_price', 'last_close_price'];
 

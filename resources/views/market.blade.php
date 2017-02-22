@@ -30,7 +30,8 @@
                     family: 'Courier New, monospace',
                     size: 18,
                     color: '#7f7f7f'
-                }
+                },
+                range: [{{ $market->start_date }}, {{ $market->end_date }}],
             },
             yaxis: {
                 title: 'Price',
