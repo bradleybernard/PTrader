@@ -8,25 +8,22 @@
         <div id="chart" style="width: 100%; height: 100%;"></div>
         <script>
             @foreach($columns as $column)
-            var x_{{ $column }} = [];
-            var y_{{ $column }} = [];
+            var data_x_{{ $column }} = [];
+            var data_y = [];
             @endforeach
 
             @foreach($history as $point) 
-                @foreach($point as $key => $val)
-                    @if($key == 'created_at')
-                        x_{{ $key }}.push('{{ $val }}');
-                    @else 
-                        y_{{ $key }}.push({{ $val }});
-                    @endif
+                @foreach($columns as $key)
+                        data_x_{{ $key }}.push({{ $point->$key }});
                 @endforeach
+                data_y.push('{{ $point->created_at }}');
             @endforeach
 
             var data = [
                 @foreach($columns as $column)
                 {
-                    x: x_{{ $column }},
-                    y: y_{{ $column }},
+                    x: data_x_{{ $column }},
+                    y: data_y,
                     type: 'scatter',
                     name: '({{ $contract->short_name }}) {{ studly_case($column) }}',
                 },
