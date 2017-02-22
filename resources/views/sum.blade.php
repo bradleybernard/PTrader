@@ -6,13 +6,22 @@
   
   <div id="chart" style="width: 100%; height: 100%;"></div>
   <script>
+
+    var data_x = [];
+    var data_y = [];
+
+    @foreach($sum as $point)
+        data_x.push('{{ $point['date'] }}');
+        data_y.push({{ $point['sum'] }});
+    @endforeach
+
     var data = [
-    {
-        x: [@foreach($sum as $point) '{{ $point['date'] }}', @endforeach],
-        y: [@foreach($sum as $point) {{ $point['sum'] }}, @endforeach],
-        type: 'scatter',
-        name: 'Sum of Buy No\'s',
-    },
+        {
+            x: data_x,
+            y: data_y,
+            type: 'scatter',
+            name: 'Sum of Buy No\'s',
+        },
     ];
 
     var layout = {
