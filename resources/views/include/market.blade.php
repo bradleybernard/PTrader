@@ -1,32 +1,56 @@
-<div class="row">
-    <div class="col-xs-12">
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h2 class="panel-title" style="font-size: 25px;">{{ $market->name }} <span class="label label-danger label-sm">-{{ $market->deleted }}</span> <span class="label label-success">{{ $market->tweets_current - $market->tweets_start }}</span></h3>
+<div class="row" style="margin-bottom: 20px;">
+    <div class="col">
+        <div class="card">
+            <div class="card-header text-center">
+                {{ $market->name }}
+                @if($market->active) 
+                    <span class="badge badge-success">Open</span>
+                @else
+                    <span class="badge badge-danger">Closed</span>
+                @endif
             </div>
-            <div class="panel-body">
-                <dl class="dl-horizontal">
-                    <dt>PredictIt Market:</dt>
-                    <dd><a href="{{ $market->url }}" target="_blank">{{ $market->ticker_symbol }}</a></dd>
-                    <dt>Twitter:</dt>
-                    <dd><a href="https://twitter.com/{{ $market->twitter->username }}" target="_blank">{{ '@' . $market->twitter->username }}</a></dd>
-                    <dt>Graphs: </dt>
-                    <dd>
-                        <a href="/market/{{ $market->market_id }}"><span class="glyphicon glyphicon-signal"></span></a> —
-                        <a href="/sum/{{ $market->market_id }}"><span class="glyphicon glyphicon-plus"></span></a>
-                    </dd>
-                    <dt>From: </dt>
-                    <dd>{{ $market->date_start }}</dd>
-                    <dt>To: </dt>
-                    <dd>{{ $market->date_end }}</dd>
-                    <dt>Remaining: </dt>
-                    <dd>{{ $market->remaining }} ({{ $market->minutes }} mins)</dd>
-                </dl>
+            <div class="card-block">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-center">G</th>
+                                <th class="text-center">M_ID</th>
+                                <th class="text-center">Twit</th>
+                                <th class="text-center">Cnt</th>
+                                <th class="text-center">Del</th>
+                                <th class="text-center">Start</th>
+                                <th class="text-center">Curr</th>
+                                <th class="text-center">Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="text-center">
+                                <td>
+                                    <a href="/market/{{ $market->market_id }}"><span class="fa fa-area-chart" style="cursor: pointer;"></span></a> &nbsp;&nbsp; 
+                                    <a href="/sum/{{ $market->market_id }}"><span class="fa fa-line-chart" style="cursor: pointer;"></span></a>
+                                </td>
+                                <td><a href="{{ $market->url }}" target="_blank">{{ $market->market_id }}</a></td>
+                                <td><a href="https://twitter.com/{{ $market->twitter->username }}" target="_blank">{{ '@' . substr($market->twitter->username, 0, 2) }}</a></td>
+                                <td>{{ $market->tweets_current - $market->tweets_start }}</td>
+                                <td>{{ $market->deleted }}</td>
+                                <td>{{ $market->tweets_start }}</td>
+                                <td>{{ $market->tweets_current }}</td>
+                                <td>{{ $market->remaining }} ({{ $market->minutes }}m)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+               {{--  <a href="/market/{{ $market->market_id }}"><span class="glyphicon glyphicon-signal"></span></a> —
+                        <a href="/sum/{{ $market->market_id }}"><span class="glyphicon glyphicon-plus"></span></a> --}}
+                        {{-- <i class="fa fa-bar-chart" aria-hidden="true"></i> --}}
+
                 <div class="table-responsive">
                     <table class="table table-bordered table-hover table-striped">
                         <thead>
                             <tr>
-                                <th class="text-center">ID</th>
+                                <th class="text-center">G</th>
+                                <th class="text-center">C_ID</th>
                                 <th class="text-center">Name</th>
                                 <th class="text-center">BBYC</th>
                                 <th class="text-center">BBNC</th>
@@ -40,10 +64,8 @@
                         <tbody>
                             @foreach($market->contracts as $contract)
                                 <tr class="text-center">
-                                    <td>
-                                        <a href="/contract/{{ $contract->contract_id }}"><span class="glyphicon glyphicon-signal"></span></a> — 
-                                        <a href="{{ $contract->url }}" target="_blank">{{ $contract->contract_id }}</a>
-                                    </td>
+                                    <td><a href="/contract/{{ $contract->contract_id }}"><span class="fa fa-area-chart" style="cursor: pointer;"></span></a></td>
+                                    <td><a href="{{ $contract->url }}" target="_blank">{{ $contract->contract_id }}</a></td>
                                     <td style="
                                     @if(($market->tweets_current - $market->tweets_start) >= $contract->MinTweets && ($market->tweets_current - $market->tweets_start) <= $contract->MaxTweets)
                                         background-color: gold;
@@ -72,6 +94,14 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+            <div class="card-footer text-muted text-center">
+                {{ $market->ticker_symbol }}
+                @if($market->active) 
+                    <span class="badge badge-success">Open</span>
+                @else
+                    <span class="badge badge-danger">Closed</span>
+                @endif
             </div>
         </div>
     </div>
