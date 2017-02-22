@@ -32,8 +32,8 @@
                                 </td>
                                 <td><a href="{{ $market->url }}" target="_blank">{{ $market->market_id }}</a></td>
                                 <td><a href="https://twitter.com/{{ $market->twitter->username }}" target="_blank">{{ '@' . substr($market->twitter->username, 0, 2) }}</a></td>
-                                <td>{{ $market->tweets_current - $market->tweets_start }}</td>
-                                <td>{{ $market->deleted }}</td>
+                                <td><span class="badge badge-success">{{ $market->tweets_current - $market->tweets_start }}</span></td>
+                                <td><span class="badge badge-danger">{{ $market->deleted }}</span></td>
                                 <td>{{ $market->tweets_start }}</td>
                                 <td>{{ $market->tweets_current }}</td>
                                 <td>{{ $market->remaining }} ({{ $market->minutes }}m)</td>

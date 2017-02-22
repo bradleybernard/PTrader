@@ -61,7 +61,7 @@
                         y0: 0,
                         y1: 1,
                         xref: 'x',
-                        yref: 'paper'  ,
+                        yref: 'paper',
                         line: {
                             color: 'rgb(30,255,30)',
                             width: 1
