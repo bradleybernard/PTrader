@@ -47,16 +47,14 @@
                             <tr>
                                 <th class="text-center">G</th>
                                 <th class="text-center">C_ID</th>
-                                @if($market->status && $market->active)
-                                    <th class="text-center">Name</th>
-                                    <th class="text-center">BBYC</th>
-                                    <th class="text-center">BBNC</th>
-                                    <th class="text-center">BSYC</th>
-                                    <th class="text-center">BSNC</th>
-                                    <th class="text-center">LCP</th>
-                                    <th class="text-center">LTP</th>
-                                    <th class="text-center">Updated</th>
-                                @endif
+                                <th class="text-center">Name</th>
+                                <th class="text-center">BBYC</th>
+                                <th class="text-center">BBNC</th>
+                                <th class="text-center">BSYC</th>
+                                <th class="text-center">BSNC</th>
+                                <th class="text-center">LCP</th>
+                                <th class="text-center">LTP</th>
+                                <th class="text-center">Updated</th>
                             </tr>
                         </thead>
                         <tbody>
