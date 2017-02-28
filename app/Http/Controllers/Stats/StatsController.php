@@ -18,7 +18,7 @@ class StatsController extends Controller
 {
     public function showStats()
     {
-        $markets = Market::where('status', true)->where('active', true)->orderBy('date_end', 'DESC')->get();
+        $markets = Market::where('status', true)->orderBy('date_end', 'DESC')->get();
         $columns = ['best_buy_yes_cost', 'best_buy_no_cost', 'best_sell_no_cost', 'best_sell_yes_cost', 'last_close_price', 'last_trade_price'];
         $highlight = ['best_buy_yes_cost', 'best_buy_no_cost', 'last_trade_price', 'last_close_price'];
 
@@ -27,13 +27,17 @@ class StatsController extends Controller
             $market->contracts = Contract::where('market_id', $market->market_id)->get()->keyBy('contract_id');
             $market->deleted = DeletedTweet::where('twitter_id', $market->twitter_id)->whereBetween('created_at', [$market->date_start, $market->date_end])->count();
             
-            $market->remaining = \Carbon\Carbon::now()->diffForHumans(\Carbon\Carbon::parse($market->date_end));
-            $market->minutes = \Carbon\Carbon::now()->diffInMinutes(\Carbon\Carbon::parse($market->date_end));
-            
             foreach($market->contracts as &$contract) {
                 $contract->parseRanges();
             }
 
+            if(!($market->status && $market->active)) {
+                continue;
+            }
+
+            $market->remaining = \Carbon\Carbon::now()->diffForHumans(\Carbon\Carbon::parse($market->date_end));
+            $market->minutes = \Carbon\Carbon::now()->diffInMinutes(\Carbon\Carbon::parse($market->date_end));
+            
             $cs = $market->contracts->pluck('contract_id');
             $history = ContractHistory::whereIn('contract_id', $cs)->orderBy('id', 'DESC')->take(count($cs))->get()->keyBy('contract_id');
             foreach($history as $cid => $hist) {

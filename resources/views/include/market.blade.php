@@ -47,14 +47,16 @@
                             <tr>
                                 <th class="text-center">G</th>
                                 <th class="text-center">C_ID</th>
-                                <th class="text-center">Name</th>
-                                <th class="text-center">BBYC</th>
-                                <th class="text-center">BBNC</th>
-                                <th class="text-center">BSYC</th>
-                                <th class="text-center">BSNC</th>
-                                <th class="text-center">LCP</th>
-                                <th class="text-center">LTP</th>
-                                <th class="text-center">Updated</th>
+                                @if($market->status && $market->active)
+                                    <th class="text-center">Name</th>
+                                    <th class="text-center">BBYC</th>
+                                    <th class="text-center">BBNC</th>
+                                    <th class="text-center">BSYC</th>
+                                    <th class="text-center">BSNC</th>
+                                    <th class="text-center">LCP</th>
+                                    <th class="text-center">LTP</th>
+                                    <th class="text-center">Updated</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -68,7 +70,9 @@
                                     @endif
                                     ">{{ $contract->short_name }}</td>
 
+
                                     @foreach($columns as $column)
+                                        @if($market->status && $market->active)
                                         <td style="{{ isset($market->maxes[$column][$contract->contract_id]) ? 'background-color: rgba(255, 0, 0, 0.5);' : '' }} {{ isset($market->mins[$column][$contract->contract_id]) ? 'background-color: rgba(0, 255, 0, 0.5);' : '' }}" >
                                             @if($contract->history)
                                                 {{ $contract->history->{$column} == 0 || $contract->history->{$column} == 1.00 ? 'None' : '$' . $contract->history->{$column} }}
@@ -76,6 +80,9 @@
                                                 N/A
                                             @endif
                                         </td>
+                                        @else 
+                                            <td>N/A</td>
+                                        @endif
                                     @endforeach
 
                                     <td>
