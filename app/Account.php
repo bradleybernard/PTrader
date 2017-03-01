@@ -26,6 +26,11 @@ class Account extends Model
         return $this->hasOne('App\Session')->where('active', true);
     }
 
+    public function trades()
+    {
+        return $this->hasMany('App\Trade');
+    }
+
     public function login() 
     {
         $file = 'cookies/' . str_random(10) . '.json';
