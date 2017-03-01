@@ -36,7 +36,11 @@
                                 <td><span class="badge badge-danger">{{ $market->deleted }}</span></td>
                                 <td>{{ $market->tweets_start }}</td>
                                 <td>{{ $market->tweets_current }}</td>
-                                <td>{{ $market->remaining }} ({{ $market->minutes }}m)</td>
+                                <td>
+                                    @if($market->remaining)
+                                        {{ $market->remaining }} ({{ $market->minutes }}m)
+                                    @endif
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -98,11 +102,6 @@
             </div>
             <div class="card-footer text-muted text-center">
                 {{ $market->ticker_symbol }}
-                @if($market->active) 
-                    <span class="badge badge-success">Open</span>
-                @else
-                    <span class="badge badge-danger">Closed</span>
-                @endif
             </div>
         </div>
     </div>
