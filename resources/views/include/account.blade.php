@@ -32,7 +32,13 @@
                                 <td class="text-center">{{ $account->email }}</td>
                                 <td class="text-center">{{ $account->phone }}</td>
                                 <td class="text-center">{{ $account->algorithm }}</span></td>
-                                <td class="text-center">${{ $account->available }}</td>
+                                <td class="text-center">
+                                    @if($account->available >= 1.00)
+                                        <span class="badge badge-success">${{ $account->available }}</span>
+                                    @else 
+                                        <span class="badge badge-danger">${{ $account->available }}</span>
+                                    @endif
+                                </td>
                                 <td class="text-center">${{ $account->gain_loss }}</td>
                                 <td class="text-center">${{ $account->invested }}</td>
                                 <td class="text-center">{{ $account->updated_at }}</td>
