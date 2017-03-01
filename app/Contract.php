@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Trade;
 use App\Session;
 use App\Share;
+use App\Market;
 use Log;
 use Nexmo;
 
@@ -127,12 +128,18 @@ class Contract extends Model
             
             if(!isset($parts[0])) {
                 Log::error($row->outertext);
+                continue;
             }
 
-            $tiers[] = (object) [
+            $tier = (object) [
                 'quantity' => (int)trim($parts[0]->plaintext),
                 'price' => (float) (rtrim(trim($parts[1]->plaintext), '¢')/100),
             ];
+
+            if($tier->price <= Market::buyNoMin || $tier->price >= Market::buyNoMax)
+                continue;
+
+            $tiers[] = $tier;
         }
 
         foreach($tiers as $tier) {
@@ -194,7 +201,7 @@ class Contract extends Model
             Nexmo::message()->send([
                 'to' => $account->phone,
                 'from' => config('nexmo.phone'),
-                'text' => "{$trade->quantity} no shares ($" . $trade->price_per_share . "/share) purchased at $" . $trade->total . " for market: {$this->market->short_name}. Current account balance for {$account->name}: $" . $account->available,
+                'text' => "{$trade->quantity} no shares ($" . $trade->price_per_share . "/share) purchased at $" . $trade->total . " for contract: " . $this->short_name . " in market: {$this->market->short_name}. Current account balance for {$account->name}: $" . $account->available,
             ]);
 
             // Insert shares

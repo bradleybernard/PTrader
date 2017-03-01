@@ -11,6 +11,9 @@ class Market extends Model
 {
     use Traits\SendsRequests;
 
+    const buyNoMin = 0.00;
+    const buyNoMax = 0.98;
+
     protected $guarded = [];
     protected $baseUri  = 'https://www.predictit.org/';
     
@@ -114,7 +117,7 @@ class Market extends Model
 
         foreach($response->Contracts as $contract) {
             $this->parseRanges($contract);
-            if($contract->Status === 'Open' && $contract->BestBuyNoCost > 0.00 && $contract->BestBuyNoCost < 0.98 && $tweetCount > $contract->MaxTweets) {
+            if($contract->Status === 'Open' && $contract->BestBuyNoCost > self::buyNoMin && $contract->BestBuyNoCost < self::buyNoMax && $tweetCount > $contract->MaxTweets) {
                 $model = Contract::select(['id', 'market_id', 'contract_id', 'active', 'status'])->where('contract_id', $contract->ID)->first();
                 $model->fill(['cost' => $contract->BestBuyNoCost, 'action' => Contract::BUY, 'type' => Contract::NO]);
                 $contracts[] = $model;
