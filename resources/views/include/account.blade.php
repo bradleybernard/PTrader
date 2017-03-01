@@ -41,7 +41,7 @@
                                 </td>
                                 <td class="text-center">${{ $account->gain_loss }}</td>
                                 <td class="text-center">${{ $account->invested }}</td>
-                                <td class="text-center">{{ \Carbon\Carbon::parse($account->updated_at)->diffForHumans(\Carbon\Carbon::now()) }}</td>
+                                <td class="text-center">{{ \Carbon\Carbon::parse($account->updated_at)->diffForHumans() }}</td>
                             </tr>
                         </tbody>
                     </table>
