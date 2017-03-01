@@ -21,7 +21,7 @@
                                 <th class="text-center">AVAIL</th>
                                 <th class="text-center">G/L</th>
                                 <th class="text-center">INV</th>
-                                <th class="text-center">TIME</th>
+                                <th class="text-center">UPDATED</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -41,7 +41,7 @@
                                 </td>
                                 <td class="text-center">${{ $account->gain_loss }}</td>
                                 <td class="text-center">${{ $account->invested }}</td>
-                                <td class="text-center">{{ \Carbon\Carbon::now()->diffForHumans(\Carbon\Carbon::parse($account->updated_at)) }}</td>
+                                <td class="text-center">{{ \Carbon\Carbon::parse($account->updated_at)->diffForHumans(\Carbon\Carbon::now()) }}</td>
                             </tr>
                         </tbody>
                     </table>
