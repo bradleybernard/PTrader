@@ -31,11 +31,12 @@ class StatsController extends Controller
                 $contract->parseRanges();
             }
 
+            $market->remaining = \Carbon\Carbon::now()->diffForHumans(\Carbon\Carbon::parse($market->date_end));
+
             if(!($market->status && $market->active)) {
                 continue;
             }
 
-            $market->remaining = \Carbon\Carbon::now()->diffForHumans(\Carbon\Carbon::parse($market->date_end));
             $market->minutes = \Carbon\Carbon::now()->diffInMinutes(\Carbon\Carbon::parse($market->date_end));
             
             $cs = $market->contracts->pluck('contract_id');

@@ -37,8 +37,9 @@
                                 <td>{{ $market->tweets_start }}</td>
                                 <td>{{ $market->tweets_current }}</td>
                                 <td>
-                                    @if($market->remaining)
-                                        {{ $market->remaining }} ({{ $market->minutes }}m)
+                                    {{ $market->remaining }}
+                                    @if($market->minutes)
+                                        ({{ $market->minutes }}m)
                                     @endif
                                 </td>
                             </tr>
