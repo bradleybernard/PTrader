@@ -31,13 +31,13 @@ class StatsController extends Controller
                 $contract->parseRanges();
             }
 
-            $market->remaining = \Carbon\Carbon::now()->diffForHumans(\Carbon\Carbon::parse($market->date_end));
+            $market->remaining = \Carbon\Carbon::parse($market->date_end)->diffForHumans();
 
             if(!($market->status && $market->active)) {
                 continue;
             }
 
-            $market->minutes = \Carbon\Carbon::now()->diffInMinutes(\Carbon\Carbon::parse($market->date_end));
+            $market->minutes = \Carbon\Carbon::parse($market->date_end)->diffInMinutes();
             
             $cs = $market->contracts->pluck('contract_id');
             $history = ContractHistory::whereIn('contract_id', $cs)->orderBy('id', 'DESC')->take(count($cs))->get()->keyBy('contract_id');
