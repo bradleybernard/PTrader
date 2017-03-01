@@ -72,7 +72,7 @@ class ListenForTweets extends Command
                     'api_created_at'    => \Carbon\Carbon::parse($tweet['created_at']),
                 ]);
 
-                Market::where('twitter_id', $tweet->twitter_id)->increment('tweets_current', 1);
+                Market::where('twitter_id', $tweet->twitter_id)->where('active', true)->where('status', true)->increment('tweets_current', 1);
 
                 dispatch(new BuyPastNo($tweet));
             } else if($isDelete) {

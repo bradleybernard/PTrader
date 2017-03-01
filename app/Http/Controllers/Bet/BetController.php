@@ -76,20 +76,22 @@ class BetController extends ScrapeController
     {
         $algo = 'free_nos';
 
-        if(!$market = $this->findMarket($twitterId)) {
+        if(!$markets = $this->findMarkets($twitterId)) {
             return;
         }
 
-        if(!$contracts = $market->findPastNoContracts()) {
-            return;
-        }
+        foreach($markets as $market) {
+            if(!$contracts = $market->findPastNoContracts()) {
+                return;
+            }
 
-        if(!$account = $this->chooseAccount($algo)) {
-            return;
-        }
+            if(!$account = $this->chooseAccount($algo)) {
+                return;
+            }
 
-        foreach($contracts as $contract) {
-            $contract->buyAllOfSingleNo($account);
+            foreach($contracts as $contract) {
+                $contract->buyAllOfSingleNo($account);
+            }
         }
     }
 
@@ -118,6 +120,20 @@ class BetController extends ScrapeController
         }
 
         return $market;
+    }
+
+    private function findMarkets($twitterId)
+    {
+        $markets = Market::where('twitter_id', $twitterId)
+                    ->where('active', true)
+                    ->where('status', true)
+                    ->get();
+
+        if($markets->count() == 0) {
+            return null;
+        }
+
+        return $markets;
     }
 
     private function chooseAccount($algorithm = 'free_nos')
