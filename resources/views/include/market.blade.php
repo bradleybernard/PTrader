@@ -21,7 +21,7 @@
                                 <th class="text-center">Del</th>
                                 <th class="text-center">Start</th>
                                 <th class="text-center">Curr</th>
-                                <th class="text-center">Time</th>
+                                <th class="text-center">EndDate</th>
                             </tr>
                         </thead>
                         <tbody>
