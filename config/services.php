@@ -40,6 +40,7 @@ return [
         // 'sid' => env('FORGE_SERVER_ID'),
         // 'did' => env('FORGE_DAEMON_ID'),
         'daemon' => 'daemon-' . env('FORGE_DAEMON_ID'),
+        'sudo' => env('FORGE_SUDO'),
     ]
 
 ];
