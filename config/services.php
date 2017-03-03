@@ -35,4 +35,11 @@ return [
         'secret' => env('STRIPE_SECRET'),
     ],
 
+    'forge' => [
+        'key' => env('FORGE_API_KEY'),
+        'sid' => env('FORGE_SERVER_ID'),
+        'did' => env('FORGE_DAEMON_ID'),
+        'daemon' => 'daemon-' . env('FORGE_DAEMON_ID'),
+    ]
+
 ];

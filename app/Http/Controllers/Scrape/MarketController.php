@@ -12,6 +12,7 @@ use App\Market;
 use App\Contract;
 use App\Twitter;
 use App\ContractHistory;
+use Symfony\Component\Process\Process;
 
 class MarketController extends ScrapeController
 {
@@ -196,7 +197,30 @@ class MarketController extends ScrapeController
             'twitter_id'    => $lookup[0]->id_str,
         ]);
 
+        $this->restartDaemon();
+
         return $twitter->twitter_id;
+    }
+
+    private function restartDaemon()
+    {
+
+        $process = new Process('sudo supervisorctl restart ' . config('services.forge.daemon'));
+        $process->start();
+        
+        // try {
+        //     $response = $this->client->request('POST', 'https://forge.laravel.com/api/v1/servers/' . config('services.forge.sid') . "/daemons/" . config('services.forge.did') . '/restart', [
+        //         'headers' => [
+        //             'Authorization'     => 'Bearer ' . config('services.forge.key'),
+        //             'Accept'            => 'application/json',
+        //             'Content-Type'      => 'application/json',
+        //         ]
+        //     ]);
+        // } catch (ClientException $e) {
+        //     Log::error($e->getMessage()); return;
+        // } catch (ServerException $e) {
+        //     Log::error($e->getMessage()); return;
+        // }
     }
 
     private function getTwitterId($string)
