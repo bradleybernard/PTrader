@@ -205,7 +205,7 @@ class MarketController extends ScrapeController
     private function restartDaemon()
     {
 
-        $process = new Process('echo ' . config('services.forge.sudo') . ' | sudo supervisorctl restart ' . config('services.forge.daemon'));
+        $process = new Process('echo ' . config('services.forge.sudo') . ' | sudo -S supervisorctl restart ' . config('services.forge.daemon'));
         $process->start();
         $process->wait();
 
