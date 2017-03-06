@@ -50,7 +50,7 @@ class Market extends Model
             return null;
         }
 
-        $contract = Contract::select(['id', 'market_id', 'contract_id', 'active', 'status'])->where('contract_id', $contractId)->first();
+        $contract = Contract::select(['id', 'market_id', 'contract_id', 'short_name', 'active', 'status'])->where('contract_id', $contractId)->first();
         $contract->fill([
             'cost' => $bestBuyYesCost,
             'type' => Contract::YES,
@@ -88,7 +88,7 @@ class Market extends Model
             return null;
         }
 
-        $contract = Contract::select(['id', 'market_id', 'contract_id', 'active', 'status'])->where('contract_id', $contractId)->first();
+        $contract = Contract::select(['id', 'market_id', 'contract_id', 'short_name', 'active', 'status'])->where('contract_id', $contractId)->first();
         $contract->fill([
             'cost' => $bestBuyYesCost,
             'type' => Contract::YES,
@@ -118,7 +118,7 @@ class Market extends Model
         foreach($response->Contracts as $contract) {
             $this->parseRanges($contract);
             if($contract->Status === 'Open' && $contract->BestBuyNoCost > self::buyNoMin && $contract->BestBuyNoCost < self::buyNoMax && $tweetCount > $contract->MaxTweets) {
-                $model = Contract::select(['id', 'market_id', 'contract_id', 'active', 'status'])->where('contract_id', $contract->ID)->first();
+                $model = Contract::select(['id', 'market_id', 'contract_id', 'short_name', 'active', 'status'])->where('contract_id', $contract->ID)->first();
                 $model->fill(['cost' => $contract->BestBuyNoCost, 'action' => Contract::BUY, 'type' => Contract::NO]);
                 $contracts[] = $model;
             }

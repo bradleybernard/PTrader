@@ -41,7 +41,7 @@ class MarketController extends ScrapeController
 
                 $market->parseRanges($contract);
                 if($contract->Status === 'Open' && $contract->BestBuyNoCost > Market::buyNoMin && $contract->BestBuyNoCost < Market::buyNoMax && $count > $contract->MaxTweets) {
-                    $model = Contract::select(['id', 'market_id', 'contract_id', 'active', 'status'])->where('contract_id', $contract->ID)->first();
+                    $model = Contract::select(['id', 'market_id', 'contract_id', 'short_name', 'active', 'status'])->where('contract_id', $contract->ID)->first();
                     $model->fill(['cost' => $contract->BestBuyNoCost, 'action' => Contract::BUY, 'type' => Contract::NO]);
                     $contracts[] = $model;
                 }
