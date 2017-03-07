@@ -10,6 +10,7 @@ use App\Share;
 use App\Market;
 use Log;
 use Nexmo;
+use App\Jobs\SendText;
 
 class Contract extends Model
 {
@@ -121,6 +122,7 @@ class Contract extends Model
         
         $rows = $html->find('div.offers tbody tr');
         $tiers = [];
+        
         foreach($rows as $key => $row) {
             if($key == 0) continue;
 
@@ -184,7 +186,8 @@ class Contract extends Model
                 return Log::error('Insufficient funds in the account. Balance: ' . $account->available . ' Checkout price: ' . ($tier->quantity * $tier->price));
             }
 
-            $account->available -= $total;
+            // Try to buy them all in full
+            // $account->available -= $total;
 
             $trade = Trade::create([
                 'account_id'        => $session->account_id,
@@ -198,11 +201,13 @@ class Contract extends Model
                 'total'             => ($tier->quantity * $tier->price),
             ]);
 
-            Nexmo::message()->send([
-                'to' => $account->phone,
-                'from' => config('nexmo.phone'),
-                'text' => "{$trade->quantity} no shares ($" . $trade->price_per_share . "/share) purchased at $" . $trade->total . " for contract: " . $this->short_name . " in market: {$this->market->short_name}. Current account balance for {$account->name}: $" . $account->available,
-            ]);
+            dispatch(
+                (new SendText(
+                    config('nexmo.phone'), 
+                    $account->phone, 
+                    "{$trade->quantity} no shares ($" . $trade->price_per_share . "/share) purchased at $" . $trade->total . " for contract: " . $this->short_name . " in market: {$this->market->short_name}. Current account balance for {$account->name}: $" . $account->available
+                ))->onQueue('texts')
+            );
 
             // Insert shares
         }
