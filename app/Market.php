@@ -12,7 +12,7 @@ class Market extends Model
     use Traits\SendsRequests;
 
     const buyNoMin = 0.00;
-    const buyNoMax = 0.97;
+    const buyNoMax = 0.98;
 
     protected $guarded = [];
     protected $baseUri  = 'https://www.predictit.org/';
