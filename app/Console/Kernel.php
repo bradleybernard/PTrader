@@ -29,9 +29,12 @@ class Kernel extends ConsoleKernel
         $schedule->call('App\Http\Controllers\Scrape\MarketController@scrape')
             ->everyMinute();
             
+        // $schedule->call('App\Http\Controllers\Bet\LoginController@createNewAccountSessions')
+        //     ->twiceDaily(8, 20)
+        //     ->timezone('America/New_York');
+
         $schedule->call('App\Http\Controllers\Bet\LoginController@createNewAccountSessions')
-            ->twiceDaily(8, 20)
-            ->timezone('America/New_York');
+            ->everyHour();
     }
 
     /**
