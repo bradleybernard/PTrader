@@ -92,7 +92,7 @@ class Account extends Model
             'account_id'    => $this->id,
             'cookie_file'   => $file,
             'active'        => true,
-            'expires_after' => \Carbon\Carbon::now()->addDays(1),
+            'expires_after' => \Carbon\Carbon::now()->addHours(2),
         ]);
     }
 
