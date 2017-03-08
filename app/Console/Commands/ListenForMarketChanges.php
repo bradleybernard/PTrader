@@ -30,7 +30,8 @@ class ListenForMarketChanges extends Command
         $controller = app('\App\Http\Controllers\Scrape\MarketController');
         while(true) {
             $controller->pollContracts();
-            sleep(5);
+            usleep(2500000);
+            // sleep(5);
         }
     }
 }
