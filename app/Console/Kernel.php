@@ -34,7 +34,7 @@ class Kernel extends ConsoleKernel
         //     ->timezone('America/New_York');
 
         $schedule->call('App\Http\Controllers\Bet\LoginController@createNewAccountSessions')
-            ->everyHour();
+            ->hourly();
     }
 
     /**
