@@ -10,6 +10,7 @@ use App\Twitter;
 use App\Tweet;
 use App\Market;
 use Log;
+use DB;
 
 class ListenForTweets extends Command
 {
@@ -65,16 +66,19 @@ class ListenForTweets extends Command
 
             if($isTweet) {
 
-                $tweet = Tweet::create([
-                    'twitter_id'        => $tweet['user']['id_str'],
-                    'tweet_id'          => $tweet['id_str'],
-                    'text'              => $tweet['text'],
-                    'api_created_at'    => \Carbon\Carbon::parse($tweet['created_at']),
-                ]);
+                if(!$exists = DB::table('tweets')->where('tweet_id', $tweet['id_str'])->first()) {
 
-                Market::where('twitter_id', $tweet->twitter_id)->where('active', true)->where('status', true)->increment('tweets_current', 1);
+                    $tweet = Tweet::create([
+                        'twitter_id'        => $tweet['user']['id_str'],
+                        'tweet_id'          => $tweet['id_str'],
+                        'text'              => $tweet['text'],
+                        'api_created_at'    => \Carbon\Carbon::parse($tweet['created_at']),
+                    ]);
 
-                dispatch(new BuyPastNo($tweet));
+                    Market::where('twitter_id', $tweet->twitter_id)->where('active', true)->where('status', true)->increment('tweets_current', 1);
+                    dispatch(new BuyPastNo($tweet));
+                }
+
             } else if($isDelete) {
                 dispatch(new DeleteTweet($tweet['delete']['status']));
             }
