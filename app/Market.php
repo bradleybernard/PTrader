@@ -169,6 +169,12 @@ class Market extends Model
         if($count == 3) {
             if($pieces[2] == "more")
                 $pieces[2] = PHP_INT_MAX;
+
+            if($pieces[2] == "fewer") {
+                $tmp = $pieces[0];
+                $pieces[0] = PHP_INT_MIN;
+                $pieces[2] = $tmp;
+            }
             
             if(!is_numeric($pieces[0]) || !is_numeric($pieces[2]))
                 throw new \Exception("Invalid parse occured #3.");
