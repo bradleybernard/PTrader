@@ -252,6 +252,7 @@ class Contract extends Model
 
             $this->MinTweets = PHP_INT_MIN;
             $this->MaxTweets = (int)$short;
+            return;
         }
 
         // 65+
@@ -262,6 +263,7 @@ class Contract extends Model
 
             $this->MinTweets = (int)$short;
             $this->MaxTweets = PHP_INT_MAX;
+            return;
         }
 
         // 56 (no chars after)
@@ -280,6 +282,7 @@ class Contract extends Model
 
             $this->MinTweets = (int)$pieces[0];
             $this->MaxTweets = (int)$pieces[2];
+            return;
         }
     }
 }
