@@ -123,6 +123,7 @@ class Account extends Model
             'available' => $available,
             'gain_loss' => $gainLoss,
             'invested' => $invested,
+            'updated_at' => \Carbon\Carbon::now(),
         ]);
     }
 
