@@ -203,7 +203,6 @@ class Contract extends Model
 
             dispatch(
                 (new SendText(
-                    config('nexmo.phone'), 
                     $account->phone, 
                     "{$trade->quantity} no shares ($" . $trade->price_per_share . "/share) purchased at $" . $trade->total . " for contract: " . $this->short_name . " in market: {$this->market->short_name}. Current account balance for {$account->name}: $" . $account->available
                 ))->onQueue('texts')
@@ -247,18 +246,28 @@ class Contract extends Model
 
         // 39-
         if($count == 1 && $short[$len - 1] === '-') {
+            if(!is_numeric($short))
+                throw new \Exception("Invalid parse occured.");
+
             $this->MinTweets = PHP_INT_MIN;
             $this->MaxTweets = (int)$short;
         }
 
         // 65+
         if($count == 1 && $short[$len - 1] === '+') {
+            if(!is_numeric($short))
+                throw new \Exception("Invalid parse occured.");
+
             $this->MinTweets = (int)$short;
             $this->MaxTweets = PHP_INT_MAX;
         }
 
         // 50 - 54
+        //35 or more
         if($count == 3) {
+            if(!is_numeric($pieces[0]) || !is_numeric($pieces[2]))
+                throw new \Exception("Invalid parse occured.");
+
             $this->MinTweets = (int)$pieces[0];
             $this->MaxTweets = (int)$pieces[2];
         }
