@@ -274,7 +274,7 @@ class Contract extends Model
         // 50 - 54
         //35 or more
         if($count == 3) {
-            if($pieces[2] == "more")
+            if($pieces[2] == "more") 
                 $pieces[2] = PHP_INT_MAX;
             
             if(!is_numeric($pieces[0]) || !is_numeric($pieces[2]))

@@ -139,20 +139,43 @@ class Market extends Model
 
         // 39-
         if($count == 1 && $short[$len - 1] === '-') {
+            $short = rtrim($short, "-");
+            if(!is_numeric($short))
+                throw new \Exception("Invalid parse occured #1.");
+
             $contract->MinTweets = PHP_INT_MIN;
             $contract->MaxTweets = (int)$short;
+            return;
         }
 
         // 65+
         if($count == 1 && $short[$len - 1] === '+') {
+            $short = rtrim($short, "+");
+            if(!is_numeric($short))
+                throw new \Exception("Invalid parse occured #2.");
+
             $contract->MinTweets = (int)$short;
             $contract->MaxTweets = PHP_INT_MAX;
+            return;
+        }
+
+        // 56 (no chars after)
+        if($count == 1 && ($short[$len - 1] != '+' && $short[$len - 1] != '+')) {
+            throw new \Exception("Invalid parse occured #4.");
         }
 
         // 50 - 54
+        //35 or more
         if($count == 3) {
+            if($pieces[2] == "more")
+                $pieces[2] = PHP_INT_MAX;
+            
+            if(!is_numeric($pieces[0]) || !is_numeric($pieces[2]))
+                throw new \Exception("Invalid parse occured #3.");
+
             $contract->MinTweets = (int)$pieces[0];
             $contract->MaxTweets = (int)$pieces[2];
+            return;
         }
     }
 }
