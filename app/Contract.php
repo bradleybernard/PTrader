@@ -247,7 +247,7 @@ class Contract extends Model
         // 39-
         if($count == 1 && $short[$len - 1] === '-') {
             if(!is_numeric($short))
-                throw new \Exception("Invalid parse occured.");
+                throw new \Exception("Invalid parse occured #1.");
 
             $this->MinTweets = PHP_INT_MIN;
             $this->MaxTweets = (int)$short;
@@ -256,7 +256,7 @@ class Contract extends Model
         // 65+
         if($count == 1 && $short[$len - 1] === '+') {
             if(!is_numeric($short))
-                throw new \Exception("Invalid parse occured.");
+                throw new \Exception("Invalid parse occured #2.");
 
             $this->MinTweets = (int)$short;
             $this->MaxTweets = PHP_INT_MAX;
@@ -269,7 +269,7 @@ class Contract extends Model
                 $pieces[2] = PHP_INT_MAX;
             
             if(!is_numeric($pieces[0]) || !is_numeric($pieces[2]))
-                throw new \Exception("Invalid parse occured.");
+                throw new \Exception("Invalid parse occured #3.");
 
             $this->MinTweets = (int)$pieces[0];
             $this->MaxTweets = (int)$pieces[2];
