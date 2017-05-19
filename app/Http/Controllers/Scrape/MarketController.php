@@ -46,15 +46,15 @@ class MarketController extends ScrapeController
                     $contracts[] = $model;
                 }
 
-                $history[] = [
-                    'contract_id' => $contract->ID,
-                    'last_trade_price' => $this->clean($contract->LastTradePrice),
-                    'best_buy_yes_cost' => $this->clean($contract->BestBuyYesCost),
-                    'best_buy_no_cost' => $this->clean($contract->BestBuyNoCost, true),
-                    'best_sell_yes_cost' => $this->clean($contract->BestSellYesCost, false),
-                    'best_sell_no_cost' => $this->clean($contract->BestSellNoCost),
-                    'last_close_price' => $this->clean($contract->LastClosePrice),
-                ];
+                // $history[] = [
+                //     'contract_id' => $contract->ID,
+                //     'last_trade_price' => $this->clean($contract->LastTradePrice),
+                //     'best_buy_yes_cost' => $this->clean($contract->BestBuyYesCost),
+                //     'best_buy_no_cost' => $this->clean($contract->BestBuyNoCost, true),
+                //     'best_sell_yes_cost' => $this->clean($contract->BestSellYesCost, false),
+                //     'best_sell_no_cost' => $this->clean($contract->BestSellNoCost),
+                //     'last_close_price' => $this->clean($contract->LastClosePrice),
+                // ];
             }
 
             if(count($contracts) > 0) {
@@ -65,7 +65,7 @@ class MarketController extends ScrapeController
                 continue;
             }
 
-            ContractHistory::insert($history);
+            //ContractHistory::insert($history);
         }
     }
 
