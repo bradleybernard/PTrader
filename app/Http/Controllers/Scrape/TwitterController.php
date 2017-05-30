@@ -67,7 +67,12 @@ class TwitterController extends ScrapeController
             }
 
             $html = new \Htmldom((string)$response->getBody());
-            $count = (int) $html->find('span.ProfileNav-value', 0)->{'data-count'};
+            $ele = $html->find('span.ProfileNav-value', 0);
+            if(!isset($ele->{'data-count'})) {
+                throw new \Exception("Invalid tweet verify count html element.");
+            }
+
+            $count = (int)$ele->{'data-count'};
 
             $markets = Market::where('status', 1)->where('active', 1)->where('twitter_id', $twitter->twitter_id)->where('tweets_current', '<>', $count)->get();
             foreach($markets as $market) {
