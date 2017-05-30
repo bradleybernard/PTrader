@@ -183,6 +183,7 @@ return [
         Nexmo\Laravel\NexmoServiceProvider::class,
         'Aloha\Twilio\Support\Laravel\ServiceProvider',
         // Spatie\LaravelTwitterStreamingApi\TwitterStreamingApiServiceProvider::class,
+        Sentry\SentryLaravel\SentryLaravelServiceProvider::class,
 
     ],
 
@@ -238,6 +239,7 @@ return [
          'Nexmo' => \Nexmo\Laravel\Facade\Nexmo::class,
          'Twilio' => 'Aloha\Twilio\Support\Laravel\Facade',
         // 'TwitterStreamingApi' => Spatie\LaravelTwitterStreamingApi\TwitterStreamingApiFacade::class,
+         'Sentry' => Sentry\SentryLaravel\SentryFacade::class,
 
 
     ],

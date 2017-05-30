@@ -79,6 +79,10 @@ class MarketController extends ScrapeController
             Log::error($e->getMessage()); return;
         }
 
+        if($response->getStatusCode() != 200) {
+            Log::error("MarketController::scrape() returned HTTP" . $response->getStatusCode()); return;
+        }
+
         $response = json_decode((string)$response->getBody());
         $markets = [];
 

@@ -16,6 +16,7 @@
         "nexmo/laravel": "1.0.0-beta3",
         "pda/pheanstalk": "~3.0",
         "predis/predis": "^1.1",
+        "sentry/sentry-laravel": "^0.7.0",
         "spatie/twitter-streaming-api": "^1.1",
         "thujohn/twitter": "^2.2",
         "yangqi/htmldom": "dev-master"
