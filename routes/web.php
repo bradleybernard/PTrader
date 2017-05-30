@@ -23,6 +23,7 @@ Route::get('login', 'Bet\LoginController@createNewAccountSessions');
 Route::get('twitter', 'Scrape\TwitterController@importTweets');
 Route::get('markets', 'Scrape\MarketController@scrape');
 Route::get('poll', 'Scrape\MarketController@pollContracts');
+Route::get('counts', 'Scrape\TwitterController@verifyCounts');
 
 
 // Route::get('dispatch', 'Bet\BetController@test');

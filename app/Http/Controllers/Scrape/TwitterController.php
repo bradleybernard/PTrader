@@ -7,6 +7,8 @@ use App\Http\Controllers\Scrape\ScrapeController;
 use App\Twitter;
 use App\Tweet;
 use TwitterAPI;
+use App\Market;
+use Log;
 
 class TwitterController extends ScrapeController
 {
@@ -46,6 +48,32 @@ class TwitterController extends ScrapeController
             });
 
             Tweet::insert($filtered->toArray());
+        }
+    }
+
+    public function verifyCounts() 
+    {
+
+        $twitters = Twitter::all();
+
+        foreach($twitters as $twitter) {
+
+            try {
+                $response = $this->client->request('GET', 'https://twitter.com/' . $twitter->username);
+            } catch (ClientException $e) {
+                Log::error($e->getMessage()); return;
+            } catch (ServerException $e) {
+                Log::error($e->getMessage()); return;
+            }
+
+            $html = new \Htmldom((string)$response->getBody());
+            $count = (int) $html->find('span.ProfileNav-value', 0)->{'data-count'};
+
+            $markets = Market::where('status', 1)->where('active', 1)->where('twitter_id', $twitter->twitter_id)->where('tweets_current', '<>', $count)->get();
+            foreach($markets as $market) {
+                Log::error("Market count is wrong\n Market: {$market->short_name} Wrong: {$market->tweets_current} Correct: {$count}");
+                $market->update(['tweets_current' => $count]);
+            }
         }
     }
 }

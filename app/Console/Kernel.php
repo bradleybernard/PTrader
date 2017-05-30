@@ -35,6 +35,9 @@ class Kernel extends ConsoleKernel
 
         $schedule->call('App\Http\Controllers\Bet\LoginController@createNewAccountSessions')
             ->hourly();
+
+        $schedule->call('App\Http\Controllers\Scrape\TwitterController@verifyCounts')
+            ->hourly();
     }
 
     /**
