@@ -18,16 +18,17 @@ class StatsController extends Controller
 {
     public function showStats()
     {
-        $markets = Market::where('status', true)->orderBy('date_end', 'DESC')->get();
+        $markets = Market::where('markets.status', true)->with('contracts', 'twitter')->withCount('deletedTweets')->orderBy('markets.date_end', 'DESC')->get();
         $columns = ['best_buy_yes_cost', 'best_buy_no_cost', 'best_sell_no_cost', 'best_sell_yes_cost', 'last_close_price', 'last_trade_price'];
         $highlight = ['best_buy_yes_cost', 'best_buy_no_cost', 'last_trade_price', 'last_close_price'];
 
-        foreach($markets as &$market) {
-            $market->twitter = Twitter::where('twitter_id', $market->twitter_id)->first();
-            $market->contracts = Contract::where('market_id', $market->market_id)->get()->keyBy('contract_id');
-            $market->deleted = DeletedTweet::where('twitter_id', $market->twitter_id)->whereBetween('created_at', [$market->date_start, $market->date_end])->count();
+        foreach($markets as $market) {
+            // dd($market);
+            // $market->twitter = Twitter::where('twitter_id', $market->twitter_id)->first();
+            // $market->contracts = Contract::where('market_id', $market->market_id)->get()->keyBy('contract_id');
+            $market->deleted = $market->deleted_tweets_count;
             
-            foreach($market->contracts as &$contract) {
+            foreach($market->contracts as $contract) {
                 $contract->parseRanges();
             }
 
@@ -40,10 +41,10 @@ class StatsController extends Controller
             $market->minutes = \Carbon\Carbon::parse($market->date_end)->diffInMinutes();
             
             $cs = $market->contracts->pluck('contract_id');
-            $history = ContractHistory::whereIn('contract_id', $cs)->orderBy('id', 'DESC')->take(count($cs))->get()->keyBy('contract_id');
-            foreach($history as $cid => $hist) {
-                $market->contracts[$cid]->history = $hist;
-            }
+            // $history = ContractHistory::whereIn('contract_id', $cs)->orderBy('id', 'DESC')->take(count($cs))->get()->keyBy('contract_id');
+            // foreach($history as $cid => $hist) {
+            //     $market->contracts[$cid]->history = $hist;
+            // }
 
 
             $maxes = $mins = [];
@@ -52,29 +53,29 @@ class StatsController extends Controller
                 $mins[$column] = PHP_INT_MAX;
             }
 
-            foreach($history as $contract) {
-                foreach($highlight as $column) {
-                    $value = $contract->{$column};
-                    if($value > 0.99 || $value < 0.01) 
-                        continue;
+            // foreach($history as $contract) {
+            //     foreach($highlight as $column) {
+            //         $value = $contract->{$column};
+            //         if($value > 0.99 || $value < 0.01) 
+            //             continue;
 
-                    $maxes[$column] = max($value, $maxes[$column]);
-                    $mins[$column] = min($value, $mins[$column]);
-                }
-            }
+            //         $maxes[$column] = max($value, $maxes[$column]);
+            //         $mins[$column] = min($value, $mins[$column]);
+            //     }
+            // }
         
             $gMaxes = $gMins = [];
-            foreach($history as $contract) {
-                foreach($highlight as $column) {
-                    $value = $contract->{$column};
-                    if($maxes[$column] == $value) {
-                        $gMaxes[$column][$contract->contract_id] = true;
-                    }
-                    if($mins[$column] == $value) {
-                        $gMins[$column][$contract->contract_id] = true;
-                    }
-                }
-            }
+            // foreach($history as $contract) {
+            //     foreach($highlight as $column) {
+            //         $value = $contract->{$column};
+            //         if($maxes[$column] == $value) {
+            //             $gMaxes[$column][$contract->contract_id] = true;
+            //         }
+            //         if($mins[$column] == $value) {
+            //             $gMins[$column][$contract->contract_id] = true;
+            //         }
+            //     }
+            // }
 
             $market->maxes = $gMaxes;
             $market->mins = $gMins;

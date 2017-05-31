@@ -22,6 +22,19 @@ class Market extends Model
         return $this->hasMany('App\Contract', 'market_id', 'market_id');
     }
 
+    public function twitter()
+    {
+        return $this->hasOne('App\Twitter', 'twitter_id', 'twitter_id');
+    }
+
+    public function deletedTweets()
+    {
+        return $this->hasMany('App\DeletedTweet', 'twitter_id', 'twitter_id')
+                ->whereColumn('created_at', '>=', 'markets.date_start')
+                ->whereColumn('created_at', '<=', 'markets.date_end');
+                // ([$this->date_start, $this->date_end]);
+    }
+
     public function findCheapestYesContract()
     {
         $this->createClient();
