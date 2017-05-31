@@ -161,7 +161,6 @@ class Market extends Model
         foreach($contracts as $contract) {
             $contract->parseRanges();
             if($tweetCount > $contract->MaxTweets) {
-                // $model = Contract::select(['id', 'market_id', 'contract_id', 'short_name', 'active', 'status'])->where('contract_id', $contract->contract_id)->first();
                 $contract->fill(['action' => Contract::BUY, 'type' => Contract::NO]);
                 $curr = $contract;
             } else break;
@@ -169,8 +168,6 @@ class Market extends Model
 
         if($curr) {
             $buying[] = $curr;
-            // $contracts[5]->fill(['action' => Contract::BUY, 'type' => Contract::NO]);
-            // $buying[] = $contracts[5];
         }
 
         if(count($buying) == 0)

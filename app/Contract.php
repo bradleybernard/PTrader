@@ -229,7 +229,7 @@ class Contract extends Model
         }
 
         $jar = new \GuzzleHttp\Cookie\FileCookieJar(storage_path($session->cookie_file), true);
-        $tiers = DB::table('tiers')->where('contract_id', $this->contract_id)->get();
+        $tiers = DB::table('tiers')->where('market_id', $this->market_id)->where('contract_id', $this->contract_id)->get();
         if(count($tiers) == 0) return;
 
         foreach($tiers as $tier) {
