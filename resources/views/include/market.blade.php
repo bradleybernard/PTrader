@@ -14,7 +14,7 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th class="text-center">G</th>
+                               {{--  <th class="text-center">G</th> --}}
                                 <th class="text-center">M_ID</th>
                                 <th class="text-center">Twit</th>
                                 <th class="text-center">Cnt</th>
@@ -26,10 +26,10 @@
                         </thead>
                         <tbody>
                             <tr class="text-center">
-                                <td>
+                               {{--  <td>
                                     <a href="/market/{{ $market->market_id }}"><span class="fa fa-area-chart" style="cursor: pointer;"></span></a> &nbsp;&nbsp; 
                                     <a href="/sum/{{ $market->market_id }}"><span class="fa fa-line-chart" style="cursor: pointer;"></span></a>
-                                </td>
+                                </td> --}}
                                 <td><a href="{{ $market->url }}" target="_blank">{{ $market->market_id }}</a></td>
                                 <td><a href="https://twitter.com/{{ $market->twitter->username }}" target="_blank">{{ '@' . substr($market->twitter->username, 0, 2) }}</a></td>
                                 <td><span class="badge badge-success">{{ $market->tweets_current - $market->tweets_start }}</span></td>
@@ -50,7 +50,7 @@
                     <table class="table table-bordered table-hover">
                         <thead>
                             <tr>
-                                <th class="text-center">G</th>
+                                {{-- <th class="text-center">G</th> --}}
                                 <th class="text-center">C_ID</th>
                                 <th class="text-center">Name</th>
                                 <th class="text-center">BBYC</th>
@@ -65,7 +65,7 @@
                         <tbody>
                             @foreach($market->contracts as $contract)
                                 <tr class="text-center">
-                                    <td><a href="/contract/{{ $contract->contract_id }}"><span class="fa fa-area-chart" style="cursor: pointer;"></span></a></td>
+                                    {{-- <td><a href="/contract/{{ $contract->contract_id }}"><span class="fa fa-area-chart" style="cursor: pointer;"></span></a></td> --}}
                                     <td><a href="{{ $contract->url }}" target="_blank">{{ $contract->contract_id }}</a></td>
                                     <td style="
                                     @if(($market->tweets_current - $market->tweets_start) >= $contract->MinTweets && ($market->tweets_current - $market->tweets_start) <= $contract->MaxTweets)
