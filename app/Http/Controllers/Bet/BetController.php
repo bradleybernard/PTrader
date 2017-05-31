@@ -97,7 +97,8 @@ class BetController extends ScrapeController
             // NOT! parallel http requests after sql query
             // cant buy more expensive stuff before cheap stuff! :(
             foreach($contracts as $contract) {
-                $contract->fastBuyAllOfSingleNo($account);
+                // $contract->fastBuyAllOfSingleNo($account);
+                $contract->buyAllOfSingleNo($account);
             }
         }
     }
