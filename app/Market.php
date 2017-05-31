@@ -99,6 +99,7 @@ class Market extends Model
     }
 
     // taking all contracts past tweet count... should only take "near" ones
+    // and also uses 30sec old api data
     public function findPastNoContracts()
     {
         $this->createClient();
@@ -154,9 +155,9 @@ class Market extends Model
         }
 
         if($curr) {
-            // $buying[] = $curr;
-            $contracts[5]->fill(['action' => Contract::BUY, 'type' => Contract::NO]);
-            $buying[] = $contracts[5];
+            $buying[] = $curr;
+            // $contracts[5]->fill(['action' => Contract::BUY, 'type' => Contract::NO]);
+            // $buying[] = $contracts[5];
         }
 
         if(count($buying) == 0)

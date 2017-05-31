@@ -207,9 +207,6 @@ class MarketController extends ScrapeController
                     Log::error($e->getMessage()); return;
                 }
 
-                // echo (string)$response->getBody();
-                // die();
-
                 $html = new \Htmldom((string)$response->getBody());            
                 $rows = $html->find('div.offers tbody tr');
                 $tiers = [];

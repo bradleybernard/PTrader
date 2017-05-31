@@ -230,11 +230,9 @@ class Contract extends Model
 
         $jar = new \GuzzleHttp\Cookie\FileCookieJar(storage_path($session->cookie_file), true);
         $tiers = DB::table('tiers')->where('contract_id', $this->contract_id)->get();
-        $requests =  [];
+        if(count($tiers) == 0) return;
 
         foreach($tiers as $tier) {
-
-            $tier->quantity = 1;
 
             $total = $tier->quantity * $tier->price;
             while($total > $account->available) {
@@ -243,74 +241,59 @@ class Contract extends Model
 
             if($tier->quantity < 1) continue;
 
-            $requests[] = $this->client->request('POST', 'Trade/SubmitTrade', [
-                'cookies' => $jar,
-                'form_params' => [ 
-                    '__RequestVerificationToken'        => $account->session->csrf_token,
-                    'BuySellViewModel.ContractId'       => $this->contract_id,
-                    'BuySellViewModel.TradeType'        => $this->tradeType(),
-                    'BuySellViewModel.Quantity'         => $tier->quantity,
-                    'BuySellViewModel.PricePerShare'    => $tier->price,
-                    'X-Requested-With'                  => 'XMLHttpRequest',
-                ],
+            try {
+                $response = $this->client->request('POST', 'Trade/SubmitTrade', [
+                    'cookies' => $jar,
+                    'form_params' => [ 
+                        '__RequestVerificationToken'        => $account->session->csrf_token,
+                        'BuySellViewModel.ContractId'       => $this->contract_id,
+                        'BuySellViewModel.TradeType'        => $this->tradeType(),
+                        'BuySellViewModel.Quantity'         => $tier->quantity,
+                        'BuySellViewModel.PricePerShare'    => $tier->price,
+                        'X-Requested-With'                  => 'XMLHttpRequest',
+                    ],
+                ]);
+            } catch (ClientException $e) {
+                Log::error($e->getMessage()); return;
+            } catch (ServerException $e) {
+                Log::error($e->getMessage()); return;
+            }
+
+            if($response->getStatusCode() != 200) {
+                return Log::error("Bad HTTP code: " . $response->getStatusCode() . "\n\n" . (string)$response->getBody()); 
+            }
+
+            $content = (string)$response->getBody();
+            if(strpos($content, 'There was a problem creating your offer') !== false) {
+                return Log::error('Might have yes or no contracts preventing you from purchasing the opposite contract. ContractId: ' . $this->contract_id . ' Type: ' . $this->type); 
+            } else if(strpos($content, 'You do not have sufficient funds to make this offer') !== false) {
+                return Log::error('Insufficient funds in the account. Balance: ' . $account->available . ' Checkout price: ' . ($tier->quantity * $tier->price));
+            }
+
+            // Try to buy them all in full
+            // $account->available -= $total;
+
+            $trade = Trade::create([
+                'account_id'        => $session->account_id,
+                'order_id'          => $this->getOrderId($response),
+                'market_id'         => $this->market_id,
+                'contract_id'       => $this->contract_id,
+                'action'            => $this->action,
+                'type'              => $this->type,
+                'quantity'          => $tier->quantity,
+                'price_per_share'   => $tier->price,
+                'total'             => ($tier->quantity * $tier->price),
             ]);
+
+            dispatch(
+                (new SendText(
+                    $account->phone, 
+                    "{$trade->quantity} no shares ($" . $trade->price_per_share . "/share) purchased at $" . $trade->total . " for contract: " . $this->short_name . " in market: {$this->market->short_name}. Current account balance for {$account->name}: $" . $account->available
+                ))->onQueue('texts')
+            );
         }
 
-        if(count($requests) == 0) {
-            Log::error("No tiers satisfied for contract to buy"); return;
-        }
-
-        // dd("GOT HERE");
-
-        $starttime = microtime(true);
-        $results = Promise\settle($requests)->wait();
-        $endtime = microtime(true);
-        echo(" " . ($endtime - $starttime));
-
-        foreach($results as $response) {
-            $response = $response['value'];
-            echo (string)$response->getBody();
-            die();
-            // dd($response['value']);
-        }
-
-        // if($response->getStatusCode() != 200) {
-        //     return Log::error("Bad HTTP code: " . $response->getStatusCode() . "\n\n" . (string)$response->getBody()); 
-        // }
-
-        // $content = (string)$response->getBody();
-        // if(strpos($content, 'There was a problem creating your offer') !== false) {
-        //     return Log::error('Might have yes or no contracts preventing you from purchasing the opposite contract. ContractId: ' . $this->contract_id . ' Type: ' . $this->type); 
-        // } else if(strpos($content, 'You do not have sufficient funds to make this offer') !== false) {
-        //     return Log::error('Insufficient funds in the account. Balance: ' . $account->available . ' Checkout price: ' . ($tier->quantity * $tier->price));
-        // }
-
-        // // Try to buy them all in full
-        // // $account->available -= $total;
-
-        // $trade = Trade::create([
-        //     'account_id'        => $session->account_id,
-        //     'order_id'          => $this->getOrderId($response),
-        //     'market_id'         => $this->market_id,
-        //     'contract_id'       => $this->contract_id,
-        //     'action'            => $this->action,
-        //     'type'              => $this->type,
-        //     'quantity'          => $tier->quantity,
-        //     'price_per_share'   => $tier->price,
-        //     'total'             => ($tier->quantity * $tier->price),
-        // ]);
-
-        // dispatch(
-        //     (new SendText(
-        //         $account->phone, 
-        //         "{$trade->quantity} no shares ($" . $trade->price_per_share . "/share) purchased at $" . $trade->total . " for contract: " . $this->short_name . " in market: {$this->market->short_name}. Current account balance for {$account->name}: $" . $account->available
-        //     ))->onQueue('texts')
-        // );
-
-        // // Insert shares to trades table (market_id not null if successful?)
-        
-
-        // $account->refreshMoney($jar);
+        $account->refreshMoney($jar);
     }
 
     public function getOrderId(&$response)
