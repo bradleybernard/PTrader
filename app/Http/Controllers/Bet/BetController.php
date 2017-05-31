@@ -72,6 +72,35 @@ class BetController extends ScrapeController
         $contract->buySingleYes($account);
     }
 
+    // copy of buyPastNo
+    public function fastBuyPastNo($twitterId) 
+    {
+        $algo = 'free_nos';
+
+        // sql query
+        if(!$markets = $this->findMarkets($twitterId)) {
+            return;
+        }
+
+        foreach($markets as $market) {
+
+            // sql query
+            if(!$contracts = $market->queryPastNoContracts()) {
+                return;
+            }
+
+            // sql query
+            if(!$account = $this->chooseAccount($algo)) {
+                return;
+            }
+
+            // parallel http requests after sql query
+            foreach($contracts as $contract) {
+                $contract->fastBuyAllOfSingleNo($account);
+            }
+        }
+    }
+
     public function buyPastNo($twitterId) 
     {
         $algo = 'free_nos';

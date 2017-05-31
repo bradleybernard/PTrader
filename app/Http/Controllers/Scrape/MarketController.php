@@ -11,8 +11,11 @@ use App\Jobs\BuyPastNoContinuous;
 use App\Market;
 use App\Contract;
 use App\Twitter;
+use App\Account;
 use App\ContractHistory;
+use App\Tier;
 use Symfony\Component\Process\Process;
+use DB;
 
 class MarketController extends ScrapeController
 {
@@ -162,6 +165,95 @@ class MarketController extends ScrapeController
         }
     }
 
+    public function fetchNoPrices() 
+    {
+        $account = Account::where('available', '>=', '1.00')->orderBy('available', 'desc')->first();
+        if(!$account->session)
+            return;
+
+        $jar = new \GuzzleHttp\Cookie\FileCookieJar(storage_path($account->session->cookie_file), true);
+        $markets = Market::where('active', true)->where('status', true)->get();
+
+        foreach($markets as $market) {
+
+            $selected = [];
+            $contracts = $market->contracts;
+            $tweetCount = ($market->tweets_current - $market->tweets_start);
+            $next = false;
+
+            if(count($contracts) == 0) 
+                continue;
+
+            foreach($contracts as $contract) {
+                $contract->parseRanges();
+                if(($tweetCount >= $contract->MinTweets && $tweetCount <= $contract->MaxTweets) || $next) {
+                    $next = count($selected) == 0;
+                    $contract->fill(['action' => Contract::BUY, 'type' => Contract::NO]);
+                    $selected[] = $contract;
+                    if(count($selected) == 2) break;
+                }
+            }
+
+            if(count($selected) == 0)
+                continue;
+
+            foreach($selected as $contract) {
+
+                try {
+                    $response = $this->client->request('GET', 'https://www.predictit.org/Trade/Load' . $contract->urlType() .  '?contractId=' . $contract->contract_id, ['cookies' => $jar]);
+                } catch (ClientException $e) {
+                    Log::error($e->getMessage()); return;
+                } catch (ServerException $e) {
+                    Log::error($e->getMessage()); return;
+                }
+
+                // echo (string)$response->getBody();
+                // die();
+
+                $html = new \Htmldom((string)$response->getBody());            
+                $rows = $html->find('div.offers tbody tr');
+                $tiers = [];
+                
+                foreach($rows as $key => $row) {
+                    if($key == 0) continue;
+
+                    $parts = $row->find('td a');
+                    
+                    if(!isset($parts[0])) continue;
+
+                    $tier = (object) [
+                        'quantity' => (int)trim($parts[0]->plaintext),
+                        'price' => (float) (rtrim(trim($parts[1]->plaintext), '¢')/100),
+                    ];
+
+                    if($tier->price <= Market::buyNoMin || $tier->price >= Market::buyNoMax) continue;
+
+                    $tiers[] = $tier;
+                }
+
+                if(count($tiers) == 0) continue;
+
+                Tier::where('market_id', $market->market_id)->where('contract_id', $contract->contract_id)->delete();
+
+                $insertTiers = [];
+                $now = \Carbon\Carbon::now();
+
+                foreach($tiers as $tier) {
+                    $insertTiers[] = [
+                        'market_id' => $market->market_id,
+                        'contract_id' => $contract->contract_id,
+                        'quantity' => $tier->quantity,
+                        'price' => $tier->price,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+
+                DB::table('tiers')->insert($insertTiers);
+            }
+        }
+    }
+
     private function fixShortName(&$contract)
     {
         $len = strlen($contract->ShortName);
@@ -201,6 +293,7 @@ class MarketController extends ScrapeController
             'twitter_id'    => $lookup[0]->id_str,
         ]);
 
+        // restart because tweet listener has a new account
         $this->restartDaemon();
 
         return $twitter->twitter_id;
@@ -209,9 +302,9 @@ class MarketController extends ScrapeController
     private function restartDaemon()
     {
 
-        $process = new Process('echo ' . config('services.forge.sudo') . ' | sudo -S supervisorctl restart ' . config('services.forge.daemon'));
-        $process->start();
-        $process->wait();
+        // $process = new Process('echo ' . config('services.forge.sudo') . ' | sudo -S supervisorctl restart ' . config('services.forge.daemon'));
+        // $process->start();
+        // $process->wait();
 
         // try {
         //     $response = $this->client->request('POST', 'https://forge.laravel.com/api/v1/servers/' . config('services.forge.sid') . "/daemons/" . config('services.forge.did') . '/restart', [

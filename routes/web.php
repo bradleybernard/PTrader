@@ -24,9 +24,10 @@ Route::get('twitter', 'Scrape\TwitterController@importTweets');
 Route::get('markets', 'Scrape\MarketController@scrape');
 Route::get('poll', 'Scrape\MarketController@pollContracts');
 Route::get('counts', 'Scrape\TwitterController@verifyCounts');
+Route::get('tiers', 'Scrape\MarketController@fetchNoPrices');
 
 
-// Route::get('dispatch', 'Bet\BetController@test');
+Route::get('dispatch', 'Bet\BetController@test');
 // Route::get('bet/{twitterId}', 'Bet\BetController@placeBet');
 // Route::get('revert', function() {
 //     app('App\Http\Controllers\Bet\BetController')->revertNoBets('822215679726100480');

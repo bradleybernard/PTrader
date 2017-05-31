@@ -27,16 +27,16 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->call('App\Http\Controllers\Scrape\MarketController@scrape')
-            ->everyMinute();
-            
-        // $schedule->call('App\Http\Controllers\Bet\LoginController@createNewAccountSessions')
-        //     ->twiceDaily(8, 20)
-        //     ->timezone('America/New_York');
-
-        $schedule->call('App\Http\Controllers\Bet\LoginController@createNewAccountSessions')
             ->hourly();
 
         $schedule->call('App\Http\Controllers\Scrape\TwitterController@verifyCounts')
+            ->hourly();
+
+        // maybe should make a daemon for most up-to-date price grabs
+        $schedule->call('App\Http\Controllers\Scrape\MarketController@fetchNoPrices')
+            ->everyMinute();
+
+        $schedule->call('App\Http\Controllers\Bet\LoginController@createNewAccountSessions')
             ->hourly();
     }
 

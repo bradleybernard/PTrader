@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use \GuzzleHttp\Client;
+use \GuzzleHttp\Promise;
 
 trait SendsRequests {
 

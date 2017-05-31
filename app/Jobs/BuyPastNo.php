@@ -22,6 +22,7 @@ class BuyPastNo implements ShouldQueue
 
     public function handle()
     {
-        app('App\Http\Controllers\Bet\BetController')->buyPastNo($this->tweet->twitter_id);
+        // app('App\Http\Controllers\Bet\BetController')->buyPastNo($this->tweet->twitter_id);
+        app('App\Http\Controllers\Bet\BetController')->fastBuyPastNo($this->tweet->twitter_id);
     }
 }

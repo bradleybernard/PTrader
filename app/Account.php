@@ -39,7 +39,7 @@ class Account extends Model
         $token = $this->getToken($jar);
 
         if(!$token) {
-            return;
+            throw new \Exception("Can't fetch request verification token from home page");
         }
 
         try {
@@ -61,9 +61,10 @@ class Account extends Model
         }
 
         $response = json_decode((string)$response->getBody());
+
         if($response->IsSuccess === true) {
             $this->removeExpired();
-            $this->insertSession($file);
+            $this->insertSession($file, $jar);
             $this->refreshMoney($jar);
         } else {
             Log::error("Login failed for accountId: $this->id");
@@ -84,15 +85,17 @@ class Account extends Model
         Session::whereIn('id', $expired->pluck('id')->toArray())->delete();
     }
 
-    public function insertSession($file)
+    public function insertSession($file, $jar)
     {
         Session::where('account_id', $this->id)->where('active', true)->update(['active' => false]);
         
         return Session::create([
             'account_id'    => $this->id,
             'cookie_file'   => $file,
+            'csrf_token'    => $this->fetchCSRF($jar),
             'active'        => true,
             'expires_after' => \Carbon\Carbon::now()->addHours(2),
+
         ]);
     }
 
@@ -127,8 +130,38 @@ class Account extends Model
         ]);
     }
 
+    public function fetchCSRF($jar = NULL)
+    {
+        $this->createClient();
+        
+        if(!$jar) {
+            $session = $this->session;
+            $jar = new \GuzzleHttp\Cookie\FileCookieJar(storage_path($session->cookie_file), true);
+        }
+
+        try {
+            $response = $this->client->request('GET', 'Account/Settings', ['cookies' => $jar]);
+        } catch (ClientException $e) {
+            Log::error($e->getMessage()); return;
+        } catch (ServerException $e) {
+            Log::error($e->getMessage()); return;
+        }
+
+        $html = new \Htmldom((string)$response->getBody());
+        $form = $html->find('#AccountForm', 0);
+        if(!$form) {
+            throw new \Exception("Can't find CSRF token for account.");
+        }
+
+        $csrf = $form->find('input[name="' . $this->input . '"]', 0)->value;
+
+        return $csrf;
+    }
+
     private function getToken($jar)
     {
+        $this->createClient();
+        
         try {
             $response = $this->client->request('GET', '', ['cookies' => $jar]);
         } catch (ClientException $e) {

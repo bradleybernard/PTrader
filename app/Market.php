@@ -98,6 +98,7 @@ class Market extends Model
         return $contract;
     }
 
+    // taking all contracts past tweet count... should only take "near" ones
     public function findPastNoContracts()
     {
         $this->createClient();
@@ -129,6 +130,39 @@ class Market extends Model
         }
 
         return $contracts;
+    }
+
+    // copy of findPastNoContracts without http request
+    public function queryPastNoContracts() 
+    {
+        $buying = [];
+        $tweetCount = ($this->tweets_current - $this->tweets_start);
+
+        $contracts = $this->contracts;
+        if(count($contracts) == 0) 
+            return null;
+
+        $curr = NULL;
+
+        foreach($contracts as $contract) {
+            $contract->parseRanges();
+            if($tweetCount > $contract->MaxTweets) {
+                // $model = Contract::select(['id', 'market_id', 'contract_id', 'short_name', 'active', 'status'])->where('contract_id', $contract->contract_id)->first();
+                $contract->fill(['action' => Contract::BUY, 'type' => Contract::NO]);
+                $curr = $contract;
+            } else break;
+        }
+
+        if($curr) {
+            // $buying[] = $curr;
+            $contracts[5]->fill(['action' => Contract::BUY, 'type' => Contract::NO]);
+            $buying[] = $contracts[5];
+        }
+
+        if(count($buying) == 0)
+            return null;
+
+        return $buying;
     }
 
     public function parseRanges(&$contract) {
