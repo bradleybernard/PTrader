@@ -29,8 +29,8 @@
                                 <td class="text-center">
                                     <a href="/account/{{ $account->id }}/refresh"><span class="fa fa-refresh" style="cursor: pointer;"></span> {{ $account->id }}</a>
                                 </td>
-                                <td class="text-center">{{ substr($account->email, 0, 4) }}</td>
-                                <td class="text-center">{{ substr($account->phone, 0, 4) }}</td>
+                                <td class="text-center">{{ substr($account->email, 0, 4) }}…</td>
+                                <td class="text-center">{{ substr($account->phone, 0, 4) }}…</td>
                                 <td class="text-center">{{ $account->algorithm }}</span></td>
                                 <td class="text-center">
                                     @if($account->available >= 1.00)
