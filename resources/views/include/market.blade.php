@@ -15,6 +15,7 @@
                         <thead>
                             <tr>
                                {{--  <th class="text-center">G</th> --}}
+                                <th class="text-center">IMG</th>
                                 <th class="text-center">M_ID</th>
                                 <th class="text-center">Twit</th>
                                 <th class="text-center">Cnt</th>
@@ -30,6 +31,7 @@
                                     <a href="/market/{{ $market->market_id }}"><span class="fa fa-area-chart" style="cursor: pointer;"></span></a> &nbsp;&nbsp; 
                                     <a href="/sum/{{ $market->market_id }}"><span class="fa fa-line-chart" style="cursor: pointer;"></span></a>
                                 </td> --}}
+                                <td><img src="{{ $market->image }}" style="width: 50px; height:50px;"></td>
                                 <td><a href="{{ $market->url }}" target="_blank">{{ $market->market_id }}</a></td>
                                 <td><a href="https://twitter.com/{{ $market->twitter->username }}" target="_blank">{{ '@' . substr($market->twitter->username, 0, 2) }}</a></td>
                                 <td><span class="badge badge-success">{{ $market->tweets_current - $market->tweets_start }}</span></td>
