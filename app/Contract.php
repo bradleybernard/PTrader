@@ -120,7 +120,8 @@ class Contract extends Model
         }
 
         $html = new \Htmldom((string)$response->getBody());
-        $token = $html->find('input[name="__RequestVerificationToken"]', 0)->value;
+        // $token = $html->find('input[name="__RequestVerificationToken"]', 0)->value;
+        $token = $session->csrf_token;
         
         $rows = $html->find('div.offers tbody tr');
         $tiers = [];
