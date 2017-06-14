@@ -163,7 +163,7 @@ class Contract extends Model
             }
 
             // Debug
-            $tier->quantity = 1;
+            // $tier->quantity = 1;
 
             $requests[] = $this->client->postAsync('Trade/SubmitTrade', [
                 'cookies' => $jar,
