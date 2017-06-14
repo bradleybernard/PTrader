@@ -13,6 +13,9 @@ use Nexmo;
 use App\Jobs\SendText;
 use \GuzzleHttp\Promise;
 use DB;
+use Mail;
+use App\Mail\AttemptedPurchase;
+use Config;
 
 class Contract extends Model
 {
@@ -120,12 +123,11 @@ class Contract extends Model
         }
 
         $html = new \Htmldom((string)$response->getBody());
-        // $token = $html->find('input[name="__RequestVerificationToken"]', 0)->value;
         $token = $session->csrf_token;
         
         $rows = $html->find('div.offers tbody tr');
         $tiers = [];
-        
+
         foreach($rows as $key => $row) {
             if($key == 0) continue;
 
@@ -147,6 +149,7 @@ class Contract extends Model
             $tiers[] = $tier;
         }
 
+        $requests = [];
         foreach($tiers as $tier) {
 
             $total = $tier->quantity * $tier->price;
@@ -155,46 +158,35 @@ class Contract extends Model
                 $total = (--$tier->quantity) * $tier->price;
             }
 
-            // do {
-            //     $tier->quantity -= 1;
-            //     $total = $tier->quantity * $tier->price;
-            // } while($total > $account->available);
-
             if($tier->quantity < 1) {
                 continue;
             }
 
-            try {
-                $response = $this->client->request('POST', 'Trade/SubmitTrade', [
-                    'cookies' => $jar,
-                    'form_params' => [ 
-                        '__RequestVerificationToken'        => $token,
-                        'BuySellViewModel.ContractId'       => $this->contract_id,
-                        'BuySellViewModel.TradeType'        => $this->tradeType(),
-                        'BuySellViewModel.Quantity'         => $tier->quantity,
-                        'BuySellViewModel.PricePerShare'    => $tier->price,
-                        'X-Requested-With'                  => 'XMLHttpRequest',
-                    ],
-                ]);
-            } catch (ClientException $e) {
-                Log::error($e->getMessage()); return;
-            } catch (ServerException $e) {
-                Log::error($e->getMessage()); return;
-            }
+            // Debug
+            $tier->quantity = 1;
 
-            if($response->getStatusCode() != 200) {
-                return Log::error("Bad HTTP code: " . $response->getStatusCode() . "\n\n" . (string)$response->getBody()); 
-            }
+            $requests[] = $this->client->postAsync('Trade/SubmitTrade', [
+                'cookies' => $jar,
+                'form_params' => [ 
+                    '__RequestVerificationToken'        => $token,
+                    'BuySellViewModel.ContractId'       => $this->contract_id,
+                    'BuySellViewModel.TradeType'        => $this->tradeType(),
+                    'BuySellViewModel.Quantity'         => $tier->quantity,
+                    'BuySellViewModel.PricePerShare'    => $tier->price,
+                    'X-Requested-With'                  => 'XMLHttpRequest',
+                ],
+            ]);
+        }
 
-            $content = (string)$response->getBody();
-            if(strpos($content, 'There was a problem creating your offer') !== false) {
-                return Log::error('Might have yes or no contracts preventing you from purchasing the opposite contract. ContractId: ' . $this->contract_id . ' Type: ' . $this->type); 
-            } else if(strpos($content, 'You do not have sufficient funds to make this offer') !== false) {
-                return Log::error('Insufficient funds in the account. Balance: ' . $account->available . ' Checkout price: ' . ($tier->quantity * $tier->price));
-            }
+        if(count($requests) == 0) {
+            Log::error("No tiers satisfied for contract to buy"); return;
+        }
 
-            // Try to buy them all in full
-            // $account->available -= $total;
+        $results = Promise\settle($requests)->wait();
+        $when = Carbon\Carbon::now()->addMinutes(5);
+
+        foreach($results as $response) {
+            $response = $response['value'];
 
             $trade = Trade::create([
                 'account_id'        => $session->account_id,
@@ -208,14 +200,10 @@ class Contract extends Model
                 'total'             => ($tier->quantity * $tier->price),
             ]);
 
-            dispatch(
-                (new SendText(
-                    $account->phone, 
-                    "{$trade->quantity} no shares ($" . $trade->price_per_share . "/share) purchased at $" . $trade->total . " for contract: " . $this->short_name . " in market: {$this->market->short_name}. Current account balance for {$account->name}: $" . $account->available
-                ))->onQueue('texts')
-            );
+            $trade->account = $account;
+            $trade->contract = $this;
 
-            // Insert shares to trades table (market_id not null if successful?)
+            Mail::to(Config::get('notify'))->later($when, new AttemptedPurchase($trade));
         }
 
         $account->refreshMoney($jar);

@@ -11,6 +11,8 @@
 |
 */
 
+Route::get('purchase', 'Bet\BetController@purchase');
+
 Route::get('/', 'Stats\StatsController@showStats');
 Route::get('/stats', 'Stats\StatsController@showStats');
 Route::get('contract/{contractId}', 'Stats\StatsController@contract');

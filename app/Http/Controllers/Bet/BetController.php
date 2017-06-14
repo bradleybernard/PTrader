@@ -23,6 +23,12 @@ class BetController extends ScrapeController
         dispatch(new \App\Jobs\BuyPastNo(Tweet::find(1)));
     }
 
+    public function purchase()
+    {
+        $twitterId = '25073877';
+        $this->fastBuyPastNo($twitterId);   
+    }
+
     public function sellPurchasedNoContracts($twitterId) 
     {
         if(!$market = Market::where('twitter_id', $twitterId)->first()) {

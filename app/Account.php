@@ -104,6 +104,8 @@ class Account extends Model
         $this->createClient();
         
         if(!$jar) {
+            // should be if login is expired login again not just if no jar
+            if(!$this->session) $this->login();
             $session = $this->session;
             $jar = new \GuzzleHttp\Cookie\FileCookieJar(storage_path($session->cookie_file), true);
         }

@@ -147,7 +147,7 @@ class Market extends Model
     }
 
     // copy of findPastNoContracts without http request
-    public function queryPastNoContracts() 
+    public function queryPastNoContracts($debug = false) 
     {
         $buying = [];
         $tweetCount = ($this->tweets_current - $this->tweets_start);
@@ -162,7 +162,11 @@ class Market extends Model
             $contract->parseRanges();
             if($tweetCount > $contract->MaxTweets) {
                 $curr = $contract;
-            } else break;
+            } else {
+                if($debug)
+                    $curr = $contract;
+                break;
+            }   
         }
 
         if($curr) {
