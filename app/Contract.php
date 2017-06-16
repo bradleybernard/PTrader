@@ -183,7 +183,7 @@ class Contract extends Model
         }
 
         $results = Promise\settle($requests)->wait();
-        $when = Carbon\Carbon::now()->addMinutes(5);
+        $when = \Carbon\Carbon::now()->addMinutes(5);
 
         foreach($results as $response) {
             $response = $response['value'];
