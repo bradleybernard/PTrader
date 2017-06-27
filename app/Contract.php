@@ -128,8 +128,10 @@ class Contract extends Model
         $rows = $html->find('div.offers tbody tr');
         $tiers = [];
 
+        Log::info("Tiers found from HTML: " . count($rows));
+
         foreach($rows as $key => $row) {
-            if($key == 0) continue;
+            // if($key == 0) continue;
 
             $parts = $row->find('td a');
             
@@ -142,6 +144,8 @@ class Contract extends Model
                 'quantity' => (int)trim($parts[0]->plaintext),
                 'price' => (float) (rtrim(trim($parts[1]->plaintext), '¢')/100),
             ];
+
+            Log::info("Found tier. Price: " . $tier->price . " Quantity: " . $tier->quantity);
 
             if($tier->price <= Market::buyNoMin || $tier->price >= Market::buyNoMax)
                 continue;
@@ -157,6 +161,8 @@ class Contract extends Model
             while($total > $account->available) {
                 $total = (--$tier->quantity) * $tier->price;
             }
+
+            Log::info("Determined quantity to buy for tier:  " . $tier->quantity . " Price: " . $total);
 
             if($tier->quantity < 1) {
                 continue;
