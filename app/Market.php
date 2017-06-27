@@ -154,10 +154,9 @@ class Market extends Model
 
         $contracts = $this->contracts;
         if(count($contracts) == 0) 
-            return null;
+            return NULL;
 
         $curr = NULL;
-
         foreach($contracts as $contract) {
             $contract->parseRanges();
             if($tweetCount > $contract->MaxTweets) {

@@ -153,6 +153,11 @@ class Contract extends Model
             $tiers[] = $tier;
         }
 
+        if(count($tiers) == 0) {
+            Log::info("No valid tiers found for contractId: " . $this->contract_id);
+            return;
+        }
+
         $requests = [];
         foreach($tiers as $tier) {
 
@@ -184,9 +189,9 @@ class Contract extends Model
             ]);
         }
 
-        if(count($requests) == 0) {
-            Log::error("No tiers satisfied for contract to buy"); return;
-        }
+        // if(count($requests) == 0) {
+        //     Log::error("No tiers satisfied for contract to buy"); return;
+        // }
 
         $results = Promise\settle($requests)->wait();
         $when = \Carbon\Carbon::now()->addMinutes(5);
