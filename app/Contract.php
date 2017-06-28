@@ -128,7 +128,7 @@ class Contract extends Model
         $rows = $html->find('div.offers tbody tr');
         $tiers = [];
 
-        Log::info("Tiers found from HTML: " . count($rows));
+        Log::info("Tiers (Contract id: " . $this->contract_id . ") found from HTML: " . count($rows));
 
         foreach($rows as $key => $row) {
             // if($key == 0) continue;
@@ -159,7 +159,7 @@ class Contract extends Model
         }
 
         $requests = [];
-        foreach($tiers as $tier) {
+        foreach($tiers as $tierKey => $tier) {
 
             $total = $tier->quantity * $tier->price;
 
@@ -176,7 +176,7 @@ class Contract extends Model
             // Debug
             // $tier->quantity = 1;
 
-            $requests[] = $this->client->postAsync('Trade/SubmitTrade', [
+            $requests[$tierKey] = $this->client->postAsync('Trade/SubmitTrade', [
                 'cookies' => $jar,
                 'form_params' => [ 
                     '__RequestVerificationToken'        => $token,
@@ -189,15 +189,13 @@ class Contract extends Model
             ]);
         }
 
-        // if(count($requests) == 0) {
-        //     Log::error("No tiers satisfied for contract to buy"); return;
-        // }
-
         $results = Promise\settle($requests)->wait();
         $when = \Carbon\Carbon::now()->addMinutes(5);
 
-        foreach($results as $response) {
+        foreach($results as $tierIndex => $response) {
+
             $response = $response['value'];
+            $tier = $tiers[$tierIndex];
 
             $trade = Trade::create([
                 'account_id'        => $session->account_id,

@@ -31,6 +31,7 @@ class AttemptedPurchase extends Mailable
      */
     public function build()
     {
+        $this->trade->account->refreshMoney();
         return $this->markdown('emails.trades.purchase');
     }
 }

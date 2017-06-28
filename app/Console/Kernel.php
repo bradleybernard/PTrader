@@ -33,8 +33,8 @@ class Kernel extends ConsoleKernel
             ->hourly();
 
         // maybe should make a daemon for most up-to-date price grabs
-        $schedule->call('App\Http\Controllers\Scrape\MarketController@fetchNoPrices')
-            ->everyMinute();
+        // $schedule->call('App\Http\Controllers\Scrape\MarketController@fetchNoPrices')
+        //     ->everyMinute();
 
         $schedule->call('App\Http\Controllers\Bet\LoginController@createNewAccountSessions')
             ->hourly();

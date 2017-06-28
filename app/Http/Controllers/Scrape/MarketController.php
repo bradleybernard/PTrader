@@ -212,7 +212,7 @@ class MarketController extends ScrapeController
                 $tiers = [];
                 
                 foreach($rows as $key => $row) {
-                    if($key == 0) continue;
+                    // if($key == 0) continue;
 
                     $parts = $row->find('td a');
                     
