@@ -32,6 +32,14 @@ class AttemptedPurchase extends Mailable
     public function build()
     {
         $this->trades[0]->account->refreshMoney();
-        return $this->markdown('emails.trades.purchase');
+
+        $sum = 0;
+        foreach($this->trades as $td) {
+            $sum += $td->total;
+        }
+
+        $subject = count($this->trades) . " Orders: $" . $sum;  
+        return $this->markdown('emails.trades.purchase')
+                    ->subject($subject);
     }
 }
