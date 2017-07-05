@@ -211,7 +211,7 @@ class Contract extends Model
 
             $trade->account = $account;
             $trade->contract = $this;
-            
+
             $trades[] = $trade;
         }
 
@@ -225,6 +225,7 @@ class Contract extends Model
                 $trade->twitter = $twitter;
             }
 
+            $when = \Carbon\Carbon::now()->addMinutes(10);
             Mail::to(Config::get('notify'))->later($when, new AttemptedPurchase($trades));
         }
 
