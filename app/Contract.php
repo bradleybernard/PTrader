@@ -216,7 +216,7 @@ class Contract extends Model
         }
 
         if(count($trades) > 0) {
-
+            
             $market = $trades[0]->market;
             $twitter = $market->twitter;
 
@@ -228,33 +228,6 @@ class Contract extends Model
             $when = \Carbon\Carbon::now()->addMinutes(10);
             Mail::to(Config::get('notify'))->later($when, new AttemptedPurchase($trades));
         }
-
-
-        // $results = Promise\settle($requests)->wait();
-        // $when = \Carbon\Carbon::now()->addMinutes(5);
-
-        // foreach($results as $tierIndex => $response) {
-
-        //     $response = $response['value'];
-        //     $tier = $tiers[$tierIndex];
-
-        //     $trade = Trade::create([
-        //         'account_id'        => $session->account_id,
-        //         'order_id'          => $this->getOrderId($response),
-        //         'market_id'         => $this->market_id,
-        //         'contract_id'       => $this->contract_id,
-        //         'action'            => $this->action,
-        //         'type'              => $this->type,
-        //         'quantity'          => $tier->quantity,
-        //         'price_per_share'   => $tier->price,
-        //         'total'             => ($tier->quantity * $tier->price),
-        //     ]);
-
-        //     $trade->account = $account;
-        //     $trade->contract = $this;
-
-            Mail::to(Config::get('notify'))->later($when, new AttemptedPurchase($trade));
-        // }
 
         $account->refreshMoney($jar);
     }
