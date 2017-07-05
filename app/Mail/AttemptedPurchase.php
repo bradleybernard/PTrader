@@ -33,7 +33,7 @@ class AttemptedPurchase extends Mailable
     {
         $this->trades[0]->account->refreshMoney();
 
-        $sum = 0;
+        $sum = 0.00;
         foreach($this->trades as $td) {
             $sum += $td->total;
         }
