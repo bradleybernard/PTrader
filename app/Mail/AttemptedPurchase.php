@@ -12,16 +12,16 @@ class AttemptedPurchase extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $trade;
+    public $trades;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(Trade $trade)
+    public function __construct($trades)
     {
-        $this->trade = $trade;
+        $this->trades = $trades;
     }
 
     /**
@@ -31,7 +31,7 @@ class AttemptedPurchase extends Mailable
      */
     public function build()
     {
-        $this->trade->account->refreshMoney();
+        $this->trades[0]->account->refreshMoney();
         return $this->markdown('emails.trades.purchase');
     }
 }

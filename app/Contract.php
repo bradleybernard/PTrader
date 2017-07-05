@@ -128,8 +128,6 @@ class Contract extends Model
         $rows = $html->find('div.offers tbody tr');
         $tiers = [];
 
-        Log::info("Tiers (Contract id: " . $this->contract_id . ") found from HTML: " . count($rows));
-
         foreach($rows as $key => $row) {
             // if($key == 0) continue;
 
@@ -145,8 +143,6 @@ class Contract extends Model
                 'price' => (float) (rtrim(trim($parts[1]->plaintext), '¢')/100),
             ];
 
-            Log::info("Found tier. Price: " . $tier->price . " Quantity: " . $tier->quantity);
-
             if($tier->price <= Market::buyNoMin || $tier->price >= Market::buyNoMax)
                 continue;
 
@@ -154,11 +150,11 @@ class Contract extends Model
         }
 
         if(count($tiers) == 0) {
-            Log::info("No valid tiers found for contractId: " . $this->contract_id);
+            // Log::info("No valid tiers found for contractId: " . $this->contract_id);
             return;
         }
 
-        $requests = [];
+        $trades = [];
         foreach($tiers as $tierKey => $tier) {
 
             $total = $tier->quantity * $tier->price;
@@ -167,35 +163,39 @@ class Contract extends Model
                 $total = (--$tier->quantity) * $tier->price;
             }
 
-            Log::info("Determined quantity to buy for tier:  " . $tier->quantity . " Price: " . $total);
 
             if($tier->quantity < 1) {
                 continue;
             }
 
-            // Debug
-            // $tier->quantity = 1;
+            try {
+                $response = $this->client->request('POST', 'Trade/SubmitTrade', [
+                    'cookies' => $jar,
+                    'form_params' => [ 
+                        '__RequestVerificationToken'        => $token,
+                        'BuySellViewModel.ContractId'       => $this->contract_id,
+                        'BuySellViewModel.TradeType'        => $this->tradeType(),
+                        'BuySellViewModel.Quantity'         => $tier->quantity,
+                        'BuySellViewModel.PricePerShare'    => $tier->price,
+                        'X-Requested-With'                  => 'XMLHttpRequest',
+                    ],
+                ]);
+            } catch (ClientException $e) {
+                return Log::error($e->getMessage());
+            } catch (ServerException $e) {
+                return Log::error($e->getMessage());
+            }
 
-            $requests[$tierKey] = $this->client->postAsync('Trade/SubmitTrade', [
-                'cookies' => $jar,
-                'form_params' => [ 
-                    '__RequestVerificationToken'        => $token,
-                    'BuySellViewModel.ContractId'       => $this->contract_id,
-                    'BuySellViewModel.TradeType'        => $this->tradeType(),
-                    'BuySellViewModel.Quantity'         => $tier->quantity,
-                    'BuySellViewModel.PricePerShare'    => $tier->price,
-                    'X-Requested-With'                  => 'XMLHttpRequest',
-                ],
-            ]);
-        }
+            if($response->getStatusCode() != 200) {
+                return Log::error("Bad HTTP code: " . $response->getStatusCode() . "\n\n" . (string)$response->getBody()); 
+            }
 
-        $results = Promise\settle($requests)->wait();
-        $when = \Carbon\Carbon::now()->addMinutes(5);
-
-        foreach($results as $tierIndex => $response) {
-
-            $response = $response['value'];
-            $tier = $tiers[$tierIndex];
+            $content = (string)$response->getBody();
+            if(strpos($content, 'There was a problem creating your offer') !== false) {
+                return Log::error('Might have yes or no contracts preventing you from purchasing the opposite contract. ContractId: ' . $this->contract_id . ' Type: ' . $this->type); 
+            } else if(strpos($content, 'You do not have sufficient funds to make this offer') !== false) {
+                return Log::error('Insufficient funds in the account. Balance: ' . $account->available . ' Checkout price: ' . ($tier->quantity * $tier->price));
+            }
 
             $trade = Trade::create([
                 'account_id'        => $session->account_id,
@@ -211,9 +211,49 @@ class Contract extends Model
 
             $trade->account = $account;
             $trade->contract = $this;
+            
+            $trades[] = $trade;
+        }
+
+        if(count($trades) > 0) {
+
+            $market = $trades[0]->market;
+            $twitter = $market->twitter;
+
+            foreach($trades as $trade) {
+                $trade->market = $market;
+                $trade->twitter = $twitter;
+            }
+
+            Mail::to(Config::get('notify'))->later($when, new AttemptedPurchase($trades));
+        }
+
+
+        // $results = Promise\settle($requests)->wait();
+        // $when = \Carbon\Carbon::now()->addMinutes(5);
+
+        // foreach($results as $tierIndex => $response) {
+
+        //     $response = $response['value'];
+        //     $tier = $tiers[$tierIndex];
+
+        //     $trade = Trade::create([
+        //         'account_id'        => $session->account_id,
+        //         'order_id'          => $this->getOrderId($response),
+        //         'market_id'         => $this->market_id,
+        //         'contract_id'       => $this->contract_id,
+        //         'action'            => $this->action,
+        //         'type'              => $this->type,
+        //         'quantity'          => $tier->quantity,
+        //         'price_per_share'   => $tier->price,
+        //         'total'             => ($tier->quantity * $tier->price),
+        //     ]);
+
+        //     $trade->account = $account;
+        //     $trade->contract = $this;
 
             Mail::to(Config::get('notify'))->later($when, new AttemptedPurchase($trade));
-        }
+        // }
 
         $account->refreshMoney($jar);
     }
