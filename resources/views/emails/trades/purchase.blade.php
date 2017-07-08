@@ -24,5 +24,4 @@ View Accounts
 View Markets
 @endcomponent
 
-{{ config('app.name') }}
 @endcomponent
