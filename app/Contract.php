@@ -220,13 +220,25 @@ class Contract extends Model
             $market = $trades[0]->market;
             $twitter = $market->twitter;
 
+            Log::info("Market: ");
+            Log::info($market);
+
+            Log::info("Twitter: ");
+            Log::info($twitter);
+
             foreach($trades as $trade) {
                 $trade->market = $market;
                 $trade->twitter = $twitter;
             }
 
+            Log::info("Trades: ");
+            Log::info($trades);
+
             $when = \Carbon\Carbon::now()->addMinutes(10);
-            Mail::to(Config::get('notify'))->later($when, new AttemptedPurchase($trades));
+            Log::info("When: ");
+            Log::info($when);
+            
+            // Mail::to(Config::get('notify'))->later($when, new AttemptedPurchase($trades));
         }
 
         $account->refreshMoney($jar);
