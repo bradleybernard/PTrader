@@ -1,10 +1,5 @@
 # PredictIt Trader
-An automated trading bot that purchases no shares for PredictIt.org Twitter count markets. The bot used Twitter's streaming API  and PredictIt's API to be the first to purchase a no share when a contract was no longer feasible.
-
-### Screenshots
-![1](/Screenshots/1.png?raw=true "1")
-![2](/Screenshots/2.png?raw=true "2")
-
+A proof of concept trading bot that purchases "NO" shares for PredictIt.org Twitter count markets. The bot used Twitter's streaming API  and PredictIt's API to be the fastest to purchase a "NO" share when a contract was no longer feasible.
 
 ## Setup
 1) Fetch PredictIt markets through their API based on title "how many tweets will @__ tweet"
@@ -20,4 +15,9 @@ An automated trading bot that purchases no shares for PredictIt.org Twitter coun
 - @potus tweets his 30th tweet and there is a contract for 25-29 tweets. The bot would purchase no on the 25-29 contract since the tweet pushed it over that range.
 
 ## Disclaimer
-Only a proof of concept bot. PredictIt does not allow scraping or automated trading since it slows down their site and clouds the markets.
+ONLY a proof of concept bot. PredictIt does not allow scraping or extracting data from their site. This bot directly violates their Terms of Service so use at your own risk!
+
+### Screenshots
+![1](/Screenshots/1.png?raw=true "1")
+![2](/Screenshots/2.png?raw=true "2")
+
